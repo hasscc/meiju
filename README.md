@@ -103,3 +103,8 @@ service: meiju.get_lua
 data:
   entity_id: sensor.xac_xxxxxx_info
 ```
+
+
+## Thanks
+- https://github.com/vividmuse
+- https://github.com/mac-zhou/midea-msmart
