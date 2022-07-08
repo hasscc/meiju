@@ -1,4 +1,4 @@
-# Meiju for HomeAssistant
+# Midea Meiju for HomeAssistant
 
 ## Installing
 
