@@ -1,0 +1,10 @@
+{
+  "domain": "meiju",
+  "name": "Midea Meiju",
+  "version": "0.0.1",
+  "documentation": "https://github.com/hasscc/meiju",
+  "issue_tracker": "https://github.com/hasscc/meiju/issues",
+  "requirements": ["msmart"],
+  "codeowners": [],
+  "iot_class": "local_polling"
+}

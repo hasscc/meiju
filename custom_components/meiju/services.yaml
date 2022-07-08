@@ -1,0 +1,61 @@
+request_api:
+  description: Request Meiju API
+  fields:
+    entity_id:
+      required: false
+      selector:
+        entity:
+          integration: meiju
+    api:
+      description: API path
+      example: /user/device/list
+      required: true
+      selector:
+        text:
+    params:
+      description: Request params
+      example: '{"key":"val"}'
+      selector:
+        object:
+    username:
+      description: Login account
+      example: 18866668888
+      required: false
+      selector:
+        text:
+    throw:
+      description: Throw result
+      default: true
+      example: true
+      selector:
+        boolean:
+
+send_command:
+  description: Send control command to device
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          integration: meiju
+    command:
+      description: 'Command bytes like: `AA BB`/`[0xAA, 0xBB]`/`{10: 0x21}`'
+      example: '{10: 0x21, 11: 0x01}'
+      required: true
+      selector:
+        object:
+    throw:
+      description: Throw result
+      default: true
+      example: true
+      selector:
+        boolean:
+
+get_lua:
+  description: Get Meiju device Lua script
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          integration: meiju

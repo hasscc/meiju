@@ -1,0 +1,3 @@
+
+class Converter:
+    pass

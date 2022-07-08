@@ -1,0 +1,91 @@
+# 微波炉
+B0:
+  sensors:
+    status:
+      byte: 11
+      dict: [idle, power_on, standby, working, finish, order, pause, pause, three]
+
+# 消毒柜
+B3:
+  set_extra: {10: 0x21}
+  sensors:
+    upstair_status:
+      byte: 11
+      dict: [power_off, power_on, working, order, finish]
+      attrs_template: |-
+        {{ {
+          'preheat': bytes[26]|bitwise_and(0x02) > 0,
+          'cooling': bytes[26]|bitwise_and(0x08) > 0,
+        } }}
+    upstair_temp:
+      byte: 13
+    downstair_status:
+      byte: 16
+      dict: [power_off, power_on, working, order, finish]
+      attrs_template: |-
+        {{ {
+          'preheat': bytes[26]|bitwise_and(0x01) > 0,
+          'cooling': bytes[26]|bitwise_and(0x04) > 0,
+        } }}
+    downstair_temp:
+      byte: 18
+  binary_sensors:
+    upstair_door:
+      byte: 21
+      state_template: '{{ value|bitwise_and(0x04) > 0 }}'
+    downstair_door:
+      byte: 21
+      state_template: '{{ value|bitwise_and(0x02) > 0 }}'
+  switches:
+    upstair_power:
+      byte: 11
+      on_extra: {16: 0x01, 22: 0x01}
+      off_extra: {16: 0x00, 22: 0x00}
+    downstair_power:
+      byte: 16
+      on_extra: {16: 0x01, 22: 0x01}
+      off_extra: {16: 0x00, 22: 0x00}
+    lock:
+      byte: 21
+  selects:
+    upstair_mode:
+      byte: 12
+      options:
+        0:
+          name: 空闲
+          extra: {11: 0x00}
+        23: 保洁(75分钟75℃)
+        26: 长效存储(15分钟60℃)
+      set_extra: {11: 0x02}
+    downstair_mode:
+      byte: 17
+      options:
+        0:
+          name: 空闲
+          extra: {11: 0x00}
+        2: 烘干(75分钟75℃)
+        3: 高温消毒(60分钟125℃)
+        26: 长效存储(15分钟95℃)
+      set_extra: {11: 0x02}
+
+# 洗衣机
+DB:
+  sensors:
+    status:
+      byte: 12
+      dict: [idle, standby, working, pause, finish, fault, delay]
+
+# 热水器
+E3:
+  sensors:
+    temperature:
+      byte: 17
+    water_volume:
+      byte: 18
+
+# 电饭煲
+EA:
+  sensors:
+    status:
+      byte: 18
+      dict: [idle, schedule, cooking, keep_warn]
