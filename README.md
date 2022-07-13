@@ -25,6 +25,19 @@ meiju:
     - device_id: 160123456789002
       host: 192.168.1.102
 
+  # Multiple accounts
+  accounts:
+    - username: 18866668881
+      password: password1
+      devices:
+        - device_id: 160123456789003
+          host: 192.168.1.123
+    - username: 18866668882
+      password: password2
+      devices:
+        - device_id: 160123456789004
+          host: 192.168.1.234
+
   # https://github.com/hasscc/meiju/blob/main/custom_components/meiju/device_customizes.yaml
   customizes:
     B3: # Device type or sn8
@@ -58,19 +71,6 @@ meiju:
             23: 保洁(75分钟75℃)
             26: 长效存储(15分钟60℃)
           set_extra: {11: 0x02}
-
-  # Multiple accounts
-  accounts:
-    - username: 18866668881
-      password: password1
-      devices:
-        - device_id: 160123456789003
-          host: 192.168.1.123
-    - username: 18866668882
-      password: password2
-      devices:
-        - device_id: 160123456789004
-          host: 192.168.1.234
 ```
 
 
@@ -106,5 +106,6 @@ data:
 
 
 ## Thanks
-- https://github.com/vividmuse
+- [@vividmuse](https://github.com/vividmuse)
+- [@blindlight86](https://github.com/blindlight86)
 - https://github.com/mac-zhou/midea-msmart
