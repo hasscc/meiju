@@ -185,7 +185,7 @@ class ComponentServices:
             cmd = dict(zip(range(0, len(cmd)), cmd))
         if not isinstance(cmd, dict):
             raise ValueError(f'Send command ({cmd}) to {eid} must be str, list or dict for service: {call}')
-        res = ent.device.async_control(cmd)
+        res = await ent.device.async_control(cmd)
 
         if dat.get('throw', True):
             persistent_notification.async_create(
