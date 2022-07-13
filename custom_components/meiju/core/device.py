@@ -31,10 +31,13 @@ class MsmartDevice(base_device):
 
     def control_command(self, dic: dict):
         cmd = set_command(self.type)
-        for n in range(11, 31):
-            cmd.data[n] = 0xFF
         for k, v in dic.items():
-            cmd.data[int(k)] = int(v)
+            idx = int(k)
+            cnt = len(cmd.data)
+            if cnt <= idx:
+                for _ in range(cnt, idx + 1):
+                    cmd.data.append(0xFF)
+            cmd.data[idx] = int(v)
         cmd.data[1] = len(cmd.data) - 1
         _LOGGER.warning('control_command: %s', [dic, self.friendly_command(cmd), self._last_responses])
         return self.send_command(cmd)
