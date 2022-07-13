@@ -126,6 +126,7 @@ class ComponentServices:
             schema=vol.Schema({
                 vol.Required(ATTR_ENTITY_ID): cv.string,
                 vol.Required('command'): vol.Any(cv.string, list, dict),
+                vol.Optional('cloud', default=False): cv.boolean,
                 vol.Optional('throw', default=True): cv.boolean,
             }),
         )
@@ -185,7 +186,7 @@ class ComponentServices:
             cmd = dict(zip(range(0, len(cmd)), cmd))
         if not isinstance(cmd, dict):
             raise ValueError(f'Send command ({cmd}) to {eid} must be str, list or dict for service: {call}')
-        res = await ent.device.async_control(cmd)
+        res = await ent.device.async_control(cmd, dat.get('cloud', False))
 
         if dat.get('throw', True):
             persistent_notification.async_create(
@@ -275,6 +276,9 @@ class MeijuAccount:
 
     def decrypt_with_key(self, data):
         return self.cloud.security.decrypt_with_key(data, self.data_key)
+
+    def encrypt_with_key(self, data):
+        return self.cloud.security.encrypt_with_key(data, self.data_key)
 
     @property
     def update_interval(self):
@@ -507,7 +511,8 @@ class BaseDevice:
         return status
 
     async def auth_device(self):
-        for udpid in [get_udpid(self.did.to_bytes(6, 'big')), get_udpid(self.did.to_bytes(6, 'little'))]:
+        for byteorder in ['big', 'little']:
+            udpid = get_udpid(self.did.to_bytes(6, byteorder)) # noqa
             token, key = await self.hass.async_add_executor_job(self.account.cloud.gettoken, udpid)
             auth = None
             if token:
@@ -515,12 +520,24 @@ class BaseDevice:
             if auth:
                 self.lan_key = key
                 self.lan_token = token
+                _LOGGER.warning('%s: Auth device success: %s', self.name, [byteorder, udpid, token, key])
                 break
-            _LOGGER.warning('%s: Auth device failed: %s', self.name, [udpid, token, key])
+            _LOGGER.warning('%s: Auth device failed: %s', self.name, [byteorder, udpid, token, key])
 
-    async def async_control(self, cmd: dict):
+    async def async_control(self, cmd: dict, cloud=False):
+        cmd = self.lan_device.control_command(cmd)
+        if cloud:
+            api = '/appliance/transparent/send'
+            pkt = self.lan_device.command_packet(cmd)
+            pms = {
+                'applianceCode': str(self.did),
+                'order': self.account.encrypt_with_key(self.account.cloud.encode(pkt)).hex(),
+                'timestamp': 'true',
+            }
+            rdt = await self.account.async_request(api, pms)
+            _LOGGER.warning('%s: Control via cloud: %s', self.name, [self.account.data_key, pms, rdt])
         return await self.hass.async_add_executor_job(
-            self.lan_device.control_command, cmd
+            self.lan_device.send_command, cmd
         )
 
     async def update_hass_entities(self, domain):

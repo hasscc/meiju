@@ -44,6 +44,12 @@ send_command:
       required: true
       selector:
         object:
+    cloud:
+      description: Send command via cloud
+      default: false
+      example: false
+      selector:
+        boolean:
     throw:
       description: Throw result
       default: true
