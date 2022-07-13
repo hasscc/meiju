@@ -554,8 +554,10 @@ class BaseDevice:
                 new = XButtonEntity(k, self, cfg)
             elif add and domain == 'switch':
                 new = XSwitchEntity(k, self, cfg)
-            elif domain == 'select':
+            elif add and domain == 'select':
                 new = XSelectEntity(k, self, cfg)
+            elif add and domain == 'number':
+                new = XNumberEntity(k, self, cfg)
             if new:
                 self.entities[key] = new
                 add([new])
