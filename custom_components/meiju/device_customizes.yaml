@@ -77,10 +77,14 @@ B3:
 # 洗衣机
 DB:
   get_extra: {10: 0x03}
+  set_extra: {10: 0x02}
   sensors:
     status:
       byte: 12
       dict: [idle, standby, working, pause, finish, fault, delay]
+  switches:
+    power:
+      byte: 11
 
 # 热水器
 E3:
