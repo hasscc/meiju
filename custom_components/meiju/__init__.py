@@ -392,7 +392,7 @@ class MeijuAccount:
         for cfg in devices:
             did = cfg.get(CONF_DEVICE_ID)
             dat = dls.get(str(did))
-            _LOGGER.warning('Setup device: %s', [did, cfg, dat])
+            _LOGGER.info('Setup device: %s', [did, cfg, dat])
             if not dat:
                 continue
             dvc = BaseDevice(dat, cfg, self)
@@ -507,7 +507,7 @@ class BaseDevice:
             self.status = status
             for ent in self.entities.values():
                 await ent.async_update()
-        _LOGGER.warning('%s: Update device status: %s', self.name, status)
+        _LOGGER.info('%s: Update device status: %s', self.name, status)
         return status
 
     async def auth_device(self):
@@ -520,7 +520,7 @@ class BaseDevice:
             if auth:
                 self.lan_key = key
                 self.lan_token = token
-                _LOGGER.warning('%s: Auth device success: %s', self.name, [byteorder, udpid, token, key])
+                _LOGGER.debug('%s: Auth device success: %s', self.name, [byteorder, udpid, token, key])
                 break
             _LOGGER.warning('%s: Auth device failed: %s', self.name, [byteorder, udpid, token, key])
 
@@ -535,7 +535,7 @@ class BaseDevice:
                 'timestamp': 'true',
             }
             rdt = await self.account.async_request(api, pms)
-            _LOGGER.warning('%s: Control via cloud: %s', self.name, [self.account.data_key, pms, rdt])
+            _LOGGER.debug('%s: Control via cloud: %s', self.name, [self.account.data_key, pms, rdt])
         return await self.hass.async_add_executor_job(
             self.lan_device.send_command, cmd
         )
@@ -622,7 +622,7 @@ class BaseEntity(Entity):
         updater = self.update_from_device(self._option, 'attrs_template')
         if callable(updater):
             attrs = await updater()
-            _LOGGER.warning('%s: update attrs: %s', self.entity_id, [self._attr_state, attrs])
+            _LOGGER.debug('%s: update attrs: %s', self.entity_id, [self._attr_state, attrs])
             if isinstance(attrs, dict):
                 self._attr_extra_state_attributes.update(attrs)
 

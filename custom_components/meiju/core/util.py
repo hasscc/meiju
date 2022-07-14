@@ -6,6 +6,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 from msmart.security import security
 from msmart.packet_builder import packet_builder
+from .command import BaseCommand
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -74,15 +75,21 @@ class MsmartSecurity(security):
 
 class MsmartPacketBuilder(packet_builder):
 
-    def finalize(self, encrypt=False):
+    def set_command(self, command: BaseCommand, add_crc8=True, checksum=True):
+        self.command = command.finalize(add_crc8=add_crc8, checksum=checksum)
+
+    def finalize(self, encrypt=True):
         cmd = self.command
         # Append the command data(48 bytes) to the packet
         if encrypt:
             cmd = self.security.aes_encrypt(self.command)[:48]
+        else:
+            self.packet[0x03] = 0x10
         self.packet.extend(cmd)
         # PacketLength
         self.packet[4:6] = (len(self.packet) + 16).to_bytes(2, 'little')
         # Append a basic checksum data(16 bytes) to the packet
         self.packet.extend(self.encode32(self.packet))
+        _LOGGER.debug('packet finalize %s', [cmd.hex(' '), self.packet.hex(' '), encrypt])
         return self.packet
 

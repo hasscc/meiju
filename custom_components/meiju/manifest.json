@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "documentation": "https://github.com/hasscc/meiju",
   "issue_tracker": "https://github.com/hasscc/meiju/issues",
-  "requirements": ["msmart"],
+  "requirements": ["msmart==0.2.3"],
   "codeowners": [],
   "iot_class": "local_polling"
 }

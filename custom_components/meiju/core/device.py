@@ -1,7 +1,8 @@
 import logging
 from msmart.device.base import device as base_device
-from msmart.command import base_command, set_command
 from msmart.const import CMD_TYPE_QUERRY, CMD_TYPE_REPORT
+from .command import BaseCommand, ControlCommand
+from .cloud import MeijuCloud
 
 from .util import MsmartPacketBuilder
 
@@ -18,7 +19,7 @@ class MsmartDevice(base_device):
         return str(self.__dict__)
 
     def refresh(self):
-        cmd = base_command(self.type)
+        cmd = BaseCommand(self.type)
         self.send_command(cmd)
 
     @staticmethod
@@ -31,25 +32,16 @@ class MsmartDevice(base_device):
         return ' '.join(lst)
 
     def control_command(self, dic: dict):
-        cmd = set_command(self.type)
-        cmd.data = cmd.data[:-3]
-        for n in range(11, len(cmd.data)):
-            cmd.data[n] = 0xFF
-        for k, v in dic.items():
-            idx = int(k)
-            cnt = len(cmd.data)
-            if cnt <= idx:
-                for _ in range(cnt, idx + 1):
-                    cmd.data.append(0xFF)
-            cmd.data[idx] = int(v)
-        cmd.data[1] = len(cmd.data) - 1
-        _LOGGER.warning('control_command: %s', [self.friendly_command(cmd), self._last_responses])
+        cmd = ControlCommand(self.type)
+        cmd.from_dict(dic)
+        _LOGGER.debug('control_command: %s', cmd.data.hex(' '))
         return cmd
 
     def command_packet(self, cmd, add_crc8=False):
         pkt_builder = MsmartPacketBuilder(self.id)
-        pkt_builder.set_command(cmd, add_crc8=add_crc8)
-        data = pkt_builder.finalize()
+        pkt_builder.set_command(cmd, add_crc8)
+        data = pkt_builder.finalize(encrypt=False)
+        _LOGGER.debug('command_packet: %s', [cmd.data.hex(' '), MeijuCloud('', '').encode(data)])
         return data
 
     def send_command(self, cmd):
