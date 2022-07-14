@@ -32,7 +32,7 @@ from .core.device import MsmartDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-SCAN_INTERVAL = datetime.timedelta(seconds=66)
+SCAN_INTERVAL = datetime.timedelta(seconds=25)
 
 DEVICE_SCHEMA = vol.Schema(
     {
@@ -538,7 +538,8 @@ class BaseDevice:
         return cus
 
     async def update_device_status(self):
-        await self.hass.async_add_executor_job(self.lan_device.refresh)
+        extra = self.customizes.get('get_extra') or {}
+        await self.hass.async_add_executor_job(self.lan_device.refresh, extra)
         status = self.lan_device.status
         if status:
             self.status = status

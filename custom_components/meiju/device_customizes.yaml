@@ -1,5 +1,6 @@
 # 微波炉
 B0:
+  get_extra: {10: 0x31}
   sensors:
     status:
       byte: 11
@@ -7,6 +8,7 @@ B0:
 
 # 消毒柜
 B3:
+  get_extra: {10: 0x31}
   set_extra: {10: 0x21}
   sensors:
     upstair_status:
@@ -74,6 +76,7 @@ B3:
 
 # 洗衣机
 DB:
+  get_extra: {10: 0x03}
   sensors:
     status:
       byte: 12
@@ -81,6 +84,7 @@ DB:
 
 # 热水器
 E3:
+  get_extra: {10: 0x03, 11: 0x01, 12: 0x01}
   sensors:
     temperature:
       byte: 17
@@ -89,6 +93,7 @@ E3:
 
 # 电饭煲
 EA:
+  get_extra: {10: 0x03}
   sensors:
     status:
       byte: 18

@@ -18,22 +18,16 @@ class MsmartDevice(base_device):
     def __str__(self):
         return str(self.__dict__)
 
-    def refresh(self):
+    def refresh(self, extra: dict = None):
         cmd = BaseCommand(self.type)
+        if extra:
+            cmd.from_dict(extra)
         self.send_command(cmd)
 
-    @staticmethod
-    def friendly_command(cmd):
-        lst = []
-        idx = 0
-        for c in cmd.data:
-            lst.append(f'{idx}:{bytearray([c]).hex().upper()}')
-            idx += 1
-        return ' '.join(lst)
-
-    def control_command(self, dic: dict):
+    def control_command(self, extra: dict = None):
         cmd = ControlCommand(self.type)
-        cmd.from_dict(dic)
+        if extra:
+            cmd.from_dict(extra)
         _LOGGER.debug('control_command: %s', cmd.data.hex(' '))
         return cmd
 
@@ -60,6 +54,15 @@ class MsmartDevice(base_device):
         for response in responses:
             self.process_response(response)
         return responses
+
+    @staticmethod
+    def friendly_command(cmd):
+        lst = []
+        idx = 0
+        for c in cmd.data:
+            lst.append(f'{idx}:{bytearray([c]).hex().upper()}')
+            idx += 1
+        return ' '.join(lst)
 
     def process_response(self, data):
         if len(data) > 0:
