@@ -536,7 +536,10 @@ class BaseDevice:
             }
             rdt = await self.account.async_request(api, pms) or {}
             if rep := rdt.get('reply'):
-                rsp = self.account.cloud.decode(self.account.decrypt_with_key(rep))
+                rsp = self.account.cloud.decode(
+                    bytearray(self.account.decrypt_with_key(rep).encode())
+                )
+                rsp = bytes(rsp)
             else:
                 rsp = None
                 _LOGGER.warning('%s: Control failed via cloud: %s', self.name, [cmd.data.hex(' '), rdt])
