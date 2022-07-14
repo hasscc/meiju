@@ -65,3 +65,12 @@ get_lua:
       selector:
         entity:
           integration: meiju
+
+get_plugin:
+  description: Get Meiju device plugin
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          integration: meiju

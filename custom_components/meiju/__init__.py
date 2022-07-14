@@ -164,6 +164,14 @@ class ComponentServices:
             }),
         )
 
+        hass.services.async_register(
+            DOMAIN, 'get_plugin', self.async_get_plugin,
+            schema=vol.Schema({
+                vol.Required(ATTR_ENTITY_ID): cv.string,
+                vol.Optional('throw', default=True): cv.boolean,
+            }),
+        )
+
     async def handle_reload_config(self, call):
         config = await async_integration_yaml_config(self.hass, DOMAIN)
         if not config or DOMAIN not in config:
@@ -261,6 +269,33 @@ class ComponentServices:
         if dat.get('throw', True):
             persistent_notification.async_create(
                 self.hass, f'{rdt}', f'Meiju Lua for {ent.device.type_str}:', f'{DOMAIN}-debug',
+            )
+        return rdt
+
+    async def async_get_plugin(self, call):
+        dat = call.data or {}
+        eid = dat.get(ATTR_ENTITY_ID)
+        ent = self.hass.data[DOMAIN][CONF_ENTITIES].get(eid) if eid else None
+        if not isinstance(ent, BaseEntity):
+            raise ValueError(f'{eid} not found for service: {call}')
+        api = '/plugin/update/getPluginV2'
+        pms = {
+            'clientType': '1',
+            'clientVersion': 101,
+            'match': '1',
+            'iotAppId': '900',
+            'applianceList': json.dumps([{
+                'appType': ent.device.type_str,
+                'appModel': ent.device.sn8,
+                'applianceCode': ent.device.did,
+                'appEnterprise': ent.device.info.get('enterpriseCode', '0000'),
+                'modelNumber': ent.device.info.get('modelNumber', 0),
+            }]),
+        }
+        rdt = await ent.account.async_request(api, pms)
+        if dat.get('throw', True):
+            persistent_notification.async_create(
+                self.hass, f'{rdt}', f'Meiju Plugin for {ent.device.type_str}:', f'{DOMAIN}-debug',
             )
         return rdt
 
