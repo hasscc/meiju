@@ -37,12 +37,9 @@ B3:
       byte: 21
       state_template: '{{ value|bitwise_and(0x02) > 0 }}'
   switches:
-    upstair_power:
+    power:
       byte: 11
-      on_extra: {16: 0x01, 22: 0x01}
-      off_extra: {16: 0x00, 22: 0x00}
-    downstair_power:
-      byte: 16
+      state_template: '{{ value+bytes[16]+bytes[22] > 0 }}'
       on_extra: {16: 0x01, 22: 0x01}
       off_extra: {16: 0x00, 22: 0x00}
     lock:
@@ -51,22 +48,29 @@ B3:
     upstair_mode:
       byte: 12
       options:
-        0:
-          name: 空闲
-          extra: {11: 0x00}
-        23: 保洁(75分钟75℃)
-        26: 长效存储(15分钟60℃)
+        0: {name: 空闲, extra: {11: 0x00}}
+        23: {name: 保洁(75分钟75℃), extra: {13: 75, 14: 15, 27: 60}}
+        26: {name: 长效存储(15分钟60℃), extra: {13: 60, 14: 15, 27: 0}}
       set_extra: {11: 0x02}
     downstair_mode:
       byte: 17
       options:
-        0:
-          name: 空闲
-          extra: {11: 0x00}
-        2: 烘干(75分钟75℃)
-        3: 高温消毒(60分钟125℃)
-        26: 长效存储(15分钟95℃)
-      set_extra: {11: 0x02}
+        0: {name: 空闲, extra: {16: 0x00}}
+        2: {name: 烘干(75分钟75℃), extra: {18: 75, 19: 15, 29: 60}}
+        3: {name: 高温消毒(60分钟125℃), extra: {18: 125, 19: 0, 29: 60}}
+        26: {name: 长效存储(15分钟95℃), extra: {18: 15, 19: 35, 29: 60}}
+      set_extra: {16: 0x02}
+  numbers:
+    upstair_temp:
+      byte: 13
+      step: 5
+      min: 60
+      max: 125
+    downstair_temp:
+      byte: 18
+      step: 5
+      min: 60
+      max: 125
 
 # 洗衣机
 DB:

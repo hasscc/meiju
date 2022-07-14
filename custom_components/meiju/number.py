@@ -40,7 +40,7 @@ class XNumberEntity(BaseEntity, NumberEntity):
         super().__init__(name, device, option)
         self._attr_max_value = self._option.get('max')
         self._attr_min_value = self._option.get('min')
-        self._attr_step = self._option.get('step')
+        self._attr_step = self._option.get('step', 1)
         self._attr_native_max_value = self._attr_max_value
         self._attr_native_min_value = self._attr_min_value
         self._attr_native_step = self._attr_step

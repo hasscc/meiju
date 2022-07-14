@@ -1,19 +1,25 @@
 """The component."""
 import logging
+import asyncio
 import time
 import json
+import os
 import datetime
 import functools as fts
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant
 from homeassistant.const import *
+from homeassistant.util import yaml
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.helpers.reload import async_setup_reload_service
+from homeassistant.helpers.reload import (
+    async_integration_yaml_config,
+    async_reload_integration_platforms,
+)
 from homeassistant.helpers.template import Template
 from homeassistant.components import persistent_notification
 import homeassistant.helpers.config_validation as cv
@@ -64,7 +70,8 @@ CONFIG_SCHEMA = vol.Schema(
 async def async_setup(hass: HomeAssistant, hass_config: dict):
     hass.data.setdefault(DOMAIN, {})
     config = hass_config.get(DOMAIN) or {}
-    hass.data[DOMAIN]['config'] = config
+    await async_reload_integration_config(hass, config)
+
     hass.data[DOMAIN].setdefault(CONF_ACCOUNTS, {})
     hass.data[DOMAIN].setdefault(CONF_DEVICES, {})
     hass.data[DOMAIN].setdefault(CONF_ENTITIES, {})
@@ -73,7 +80,6 @@ async def async_setup(hass: HomeAssistant, hass_config: dict):
     component = EntityComponent(_LOGGER, DOMAIN, hass, SCAN_INTERVAL)
     hass.data[DOMAIN]['component'] = component
     await component.async_setup(config)
-    await async_setup_reload_service(hass, DOMAIN, SUPPORTED_DOMAINS)
 
     als = config.get(CONF_ACCOUNTS) or []
     if CONF_PASSWORD in config:
@@ -106,9 +112,28 @@ async def async_setup_accounts(hass: HomeAssistant, domain):
         await dvc.update_hass_entities(domain)
 
 
+async def async_reload_integration_config(hass, config):
+    hass.data[DOMAIN]['config'] = config
+
+    dcs = yaml.load_yaml(os.path.dirname(__file__) + '/device_customizes.yaml') or {}
+    DEVICE_CUSTOMIZES.update(dcs)
+
+    dcs = config.get('customizes')
+    if dcs and isinstance(dcs, dict):
+        for m, cus in dcs.items():
+            DEVICE_CUSTOMIZES.setdefault(m, {})
+            DEVICE_CUSTOMIZES[m].update(cus)
+
+    return config
+
+
 class ComponentServices:
     def __init__(self, hass: HomeAssistant):
         self.hass = hass
+
+        hass.helpers.service.async_register_admin_service(
+            DOMAIN, SERVICE_RELOAD, self.handle_reload_config,
+        )
 
         hass.services.async_register(
             DOMAIN, 'request_api', self.async_request_api,
@@ -138,6 +163,19 @@ class ComponentServices:
                 vol.Optional('throw', default=True): cv.boolean,
             }),
         )
+
+    async def handle_reload_config(self, call):
+        config = await async_integration_yaml_config(self.hass, DOMAIN)
+        if not config or DOMAIN not in config:
+            return
+        await async_reload_integration_config(self.hass, config.get(DOMAIN) or {})
+        current_entries = self.hass.config_entries.async_entries(DOMAIN)
+        reload_tasks = [
+            self.hass.config_entries.async_reload(entry.entry_id)
+            for entry in current_entries
+        ]
+        await asyncio.gather(*reload_tasks)
+        await async_reload_integration_platforms(self.hass, DOMAIN, SUPPORTED_DOMAINS)
 
     async def async_request_api(self, call):
         dat = call.data or {}
@@ -495,9 +533,8 @@ class BaseDevice:
 
     @property
     def customizes(self):
-        customizes = self.hass.data[DOMAIN].get('config', {}).get('customizes') or {}
-        cus = customizes.get(self.type_hex.upper()) or customizes.get(self.type_hex) or {}
-        cus.update(customizes.get(self.sn8) or {})
+        cus = DEVICE_CUSTOMIZES.get(self.type_hex.upper()) or DEVICE_CUSTOMIZES.get(self.type_hex) or {}
+        cus.update(DEVICE_CUSTOMIZES.get(self.sn8) or {})
         return cus
 
     async def update_device_status(self):
