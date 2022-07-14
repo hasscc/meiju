@@ -59,7 +59,6 @@ class MsmartDevice(base_device):
         self._last_responses = responses
         for response in responses:
             self.process_response(response)
-        _LOGGER.warning('send_command: %s', [cmd.data.hex(' '), responses])
         return responses
 
     def process_response(self, data):

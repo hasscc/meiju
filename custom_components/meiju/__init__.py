@@ -534,11 +534,18 @@ class BaseDevice:
                 'order': self.account.encrypt_with_key(self.account.cloud.encode(pkt)).hex(),
                 'timestamp': 'true',
             }
-            rdt = await self.account.async_request(api, pms)
-            _LOGGER.info('%s: Control via cloud: %s', self.name, [self.account.data_key, pms, rdt])
-        return await self.hass.async_add_executor_job(
-            self.lan_device.send_command, cmd
-        )
+            rdt = await self.account.async_request(api, pms) or {}
+            if rep := rdt.get('reply'):
+                rsp = self.account.cloud.decode(self.account.decrypt_with_key(rep))
+            else:
+                rsp = None
+                _LOGGER.warning('%s: Control failed via cloud: %s', self.name, [cmd.data.hex(' '), rdt])
+        else:
+            rsp = await self.hass.async_add_executor_job(
+                self.lan_device.send_command, cmd
+            )
+        _LOGGER.info('%s: Control device: %s', self.name, [cmd.data.hex(' '), rsp])
+        return rsp
 
     async def update_hass_entities(self, domain):
         from .binary_sensor import XBinarySensorEntity
