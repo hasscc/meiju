@@ -37,10 +37,10 @@ class MsmartDevice(base_device):
         _LOGGER.debug('control_command: %s', cmd.data.hex(' '))
         return cmd
 
-    def command_packet(self, cmd, add_crc8=False):
+    def command_packet(self, cmd, encrypt=True, add_crc8=False):
         pkt_builder = MsmartPacketBuilder(self.id)
         pkt_builder.set_command(cmd, add_crc8)
-        data = pkt_builder.finalize(encrypt=False)
+        data = pkt_builder.finalize(encrypt=encrypt)
         _LOGGER.debug('command_packet: %s', [cmd.data.hex(' '), MeijuCloud('', '').encode(data)])
         return data
 
@@ -59,6 +59,7 @@ class MsmartDevice(base_device):
         self._last_responses = responses
         for response in responses:
             self.process_response(response)
+        _LOGGER.warning('send_command: %s', [cmd.data.hex(' '), responses])
         return responses
 
     def process_response(self, data):

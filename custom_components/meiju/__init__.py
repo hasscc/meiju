@@ -528,14 +528,14 @@ class BaseDevice:
         cmd = self.lan_device.control_command(cmd)
         if cloud:
             api = '/appliance/transparent/send'
-            pkt = self.lan_device.command_packet(cmd)
+            pkt = self.lan_device.command_packet(cmd, encrypt=False)
             pms = {
                 'applianceCode': str(self.did),
                 'order': self.account.encrypt_with_key(self.account.cloud.encode(pkt)).hex(),
                 'timestamp': 'true',
             }
             rdt = await self.account.async_request(api, pms)
-            _LOGGER.debug('%s: Control via cloud: %s', self.name, [self.account.data_key, pms, rdt])
+            _LOGGER.info('%s: Control via cloud: %s', self.name, [self.account.data_key, pms, rdt])
         return await self.hass.async_add_executor_job(
             self.lan_device.send_command, cmd
         )
