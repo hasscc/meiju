@@ -259,6 +259,7 @@ class ComponentServices:
             'iotAppId': '900',
         }
         rdt = await ent.account.async_request(api, pms)
+        lfn = rdt['fileName']
         if url := (rdt or {}).get('url'):
             res = await ent.account.http.get(url)
             lua = await res.text()
@@ -270,6 +271,11 @@ class ComponentServices:
             persistent_notification.async_create(
                 self.hass, f'{rdt}', f'Meiju Lua for {ent.device.type_str}:', f'{DOMAIN}-debug',
             )
+        fnm = f'lua/{lfn}'
+        lfp = f'{os.path.dirname(__file__)}/{fnm}'
+        if not os.path.exists(lfp):
+            with open(lfp, 'w') as fp:
+                fp.write(lua)
         return rdt
 
     async def async_get_plugin(self, call):
