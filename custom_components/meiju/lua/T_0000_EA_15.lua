@@ -18,6 +18,7 @@ local KEY_BOTTOM_TEMPERATURE = 'bottom_temperature'
 local KEY_WORK_STAGE = 'work_stage'
 local KEY_WORK_FLAG = 'work_flag'
 local KEY_RICE_LEVEL = 'rice_level'
+
 local VALUE_VERSION = 15
 local VALUE_WORK_STATUS_KEEP_WARM = 'keep_warm'
 local VALUE_WORK_STATUS_SCHEDULE = 'schedule'
@@ -85,6 +86,7 @@ local VALUE_RICE_TYPE_NORTHEAST = 'northeast'
 local VALUE_RICE_TYPE_LONGRAIN = 'longrain'
 local VALUE_RICE_TYPE_FRAGRANT = 'fragrant'
 local VALUE_RICE_TYPE_FIVE = 'five'
+
 local BYTE_DEVICE_TYPE = 0xEA
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERY_REQUEST = 0x03
@@ -156,6 +158,7 @@ local BYTE_RICE_TYPE_NORTHEAST = 0x01
 local BYTE_RICE_TYPE_LONGRAIN = 0x02
 local BYTE_RICE_TYPE_FRAGRANT = 0x03
 local BYTE_RICE_TYPE_FIVE = 0x04
+
 local workstatus = 0
 local mode = 0
 local mouthFeel = 0
@@ -194,24 +197,26 @@ local topHot = 0
 local bottomHot = 0
 local dataType = 0
 local deviceSubType = 0
+
 local function getSoftVersion()
     if
-        (deviceSubType == '0' or deviceSubType == '1' or deviceSubType == '3' or deviceSubType == '4' or
+    (deviceSubType == '0' or deviceSubType == '1' or deviceSubType == '3' or deviceSubType == '4' or
             deviceSubType == '5' or
             deviceSubType == '6')
-     then
+    then
         return 0
     elseif (deviceSubType == '3000' or deviceSubType == 3000) then
         return 2
     elseif
-        (deviceSubType == '39' or deviceSubType == '40' or deviceSubType == '41' or deviceSubType == '42' or
+    (deviceSubType == '39' or deviceSubType == '40' or deviceSubType == '41' or deviceSubType == '42' or
             deviceSubType == '43')
-     then
+    then
         return 3
     else
         return 1
     end
 end
+
 local function jsonToModel(luaTable)
     if (luaTable[KEY_WORK_STATUS] ~= nil) then
         if luaTable[KEY_WORK_STATUS] == VALUE_WORK_STATUS_KEEP_WARM then
@@ -435,15 +440,16 @@ local function jsonToModel(luaTable)
         end
     end
 end
+
 function binToModel(messageBytes)
     if (#messageBytes == 0) then
         return nil
     end
     if getSoftVersion() == 1 or getSoftVersion() == 3 then
         if
-            ((dataType == 0x02 and messageBytes[3] == 0x02) or (dataType == 0x03 and messageBytes[3] == 0x03) or
+        ((dataType == 0x02 and messageBytes[3] == 0x02) or (dataType == 0x03 and messageBytes[3] == 0x03) or
                 (dataType == 0x04 and messageBytes[3] == 0x04))
-         then
+        then
             mode = messageBytes[4] + bit.lshift(messageBytes[5], 8)
             workstatus = messageBytes[8]
             errorCode = messageBytes[9]
@@ -465,9 +471,9 @@ function binToModel(messageBytes)
         end
     elseif getSoftVersion() == 2 then
         if
-            ((dataType == 0x02 and messageBytes[3] == 0x02) or (dataType == 0x03 and messageBytes[3] == 0x03) or
+        ((dataType == 0x02 and messageBytes[3] == 0x02) or (dataType == 0x03 and messageBytes[3] == 0x03) or
                 (dataType == 0x04 and messageBytes[3] == 0x04))
-         then
+        then
             mode = messageBytes[4] + bit.lshift(messageBytes[5], 8)
             workstatus = messageBytes[8]
             errorCode = messageBytes[9]
@@ -606,6 +612,7 @@ function binToModel(messageBytes)
         end
     end
 end
+
 function assembleJsonByGlobalProperty()
     local streams = {}
     streams[KEY_VERSION] = VALUE_VERSION
@@ -915,6 +922,7 @@ function assembleJsonByGlobalProperty()
     end
     return streams
 end
+
 function jsonToData(jsonCmdStr)
     if (#jsonCmdStr == 0) then
         return nil
@@ -1083,6 +1091,7 @@ function jsonToData(jsonCmdStr)
     end
     return ret
 end
+
 function dataToJson(jsonStr)
     if (not jsonStr) then
         return nil
@@ -1105,6 +1114,7 @@ function dataToJson(jsonStr)
     local ret = encode(retTable)
     return ret
 end
+
 function extractBodyBytes(byteData)
     local msgLength = #byteData
     local msgBytes = {}
@@ -1118,6 +1128,7 @@ function extractBodyBytes(byteData)
     end
     return bodyBytes
 end
+
 function assembleUart(bodyBytes, type)
     local bodyLength = #bodyBytes + 1
     if #bodyBytes == 0 then
@@ -1141,6 +1152,7 @@ function assembleUart(bodyBytes, type)
     msgBytes[msgLength - 1] = makeSum(msgBytes, 1, msgLength - 2)
     return msgBytes
 end
+
 function makeSum(tmpbuf, start_pos, end_pos)
     local resVal = 0
     for si = start_pos, end_pos do
@@ -1152,264 +1164,9 @@ function makeSum(tmpbuf, start_pos, end_pos)
     resVal = 255 - resVal + 1
     return resVal
 end
-local crc8_854_table = {
-    0,
-    94,
-    188,
-    226,
-    97,
-    63,
-    221,
-    131,
-    194,
-    156,
-    126,
-    32,
-    163,
-    253,
-    31,
-    65,
-    157,
-    195,
-    33,
-    127,
-    252,
-    162,
-    64,
-    30,
-    95,
-    1,
-    227,
-    189,
-    62,
-    96,
-    130,
-    220,
-    35,
-    125,
-    159,
-    193,
-    66,
-    28,
-    254,
-    160,
-    225,
-    191,
-    93,
-    3,
-    128,
-    222,
-    60,
-    98,
-    190,
-    224,
-    2,
-    92,
-    223,
-    129,
-    99,
-    61,
-    124,
-    34,
-    192,
-    158,
-    29,
-    67,
-    161,
-    255,
-    70,
-    24,
-    250,
-    164,
-    39,
-    121,
-    155,
-    197,
-    132,
-    218,
-    56,
-    102,
-    229,
-    187,
-    89,
-    7,
-    219,
-    133,
-    103,
-    57,
-    186,
-    228,
-    6,
-    88,
-    25,
-    71,
-    165,
-    251,
-    120,
-    38,
-    196,
-    154,
-    101,
-    59,
-    217,
-    135,
-    4,
-    90,
-    184,
-    230,
-    167,
-    249,
-    27,
-    69,
-    198,
-    152,
-    122,
-    36,
-    248,
-    166,
-    68,
-    26,
-    153,
-    199,
-    37,
-    123,
-    58,
-    100,
-    134,
-    216,
-    91,
-    5,
-    231,
-    185,
-    140,
-    210,
-    48,
-    110,
-    237,
-    179,
-    81,
-    15,
-    78,
-    16,
-    242,
-    172,
-    47,
-    113,
-    147,
-    205,
-    17,
-    79,
-    173,
-    243,
-    112,
-    46,
-    204,
-    146,
-    211,
-    141,
-    111,
-    49,
-    178,
-    236,
-    14,
-    80,
-    175,
-    241,
-    19,
-    77,
-    206,
-    144,
-    114,
-    44,
-    109,
-    51,
-    209,
-    143,
-    12,
-    82,
-    176,
-    238,
-    50,
-    108,
-    142,
-    208,
-    83,
-    13,
-    239,
-    177,
-    240,
-    174,
-    76,
-    18,
-    145,
-    207,
-    45,
-    115,
-    202,
-    148,
-    118,
-    40,
-    171,
-    245,
-    23,
-    73,
-    8,
-    86,
-    180,
-    234,
-    105,
-    55,
-    213,
-    139,
-    87,
-    9,
-    235,
-    181,
-    54,
-    104,
-    138,
-    212,
-    149,
-    203,
-    41,
-    119,
-    244,
-    170,
-    72,
-    22,
-    233,
-    183,
-    85,
-    11,
-    136,
-    214,
-    52,
-    106,
-    43,
-    117,
-    151,
-    201,
-    74,
-    20,
-    246,
-    168,
-    116,
-    42,
-    200,
-    150,
-    21,
-    75,
-    169,
-    247,
-    182,
-    232,
-    10,
-    84,
-    215,
-    137,
-    107,
-    53
-}
+
+local crc8_854_table = { 0, 94, 188, 226, 97, 63, 221, 131, 194, 156, 126, 32, 163, 253, 31, 65, 157, 195, 33, 127, 252, 162, 64, 30, 95, 1, 227, 189, 62, 96, 130, 220, 35, 125, 159, 193, 66, 28, 254, 160, 225, 191, 93, 3, 128, 222, 60, 98, 190, 224, 2, 92, 223, 129, 99, 61, 124, 34, 192, 158, 29, 67, 161, 255, 70, 24, 250, 164, 39, 121, 155, 197, 132, 218, 56, 102, 229, 187, 89, 7, 219, 133, 103, 57, 186, 228, 6, 88, 25, 71, 165, 251, 120, 38, 196, 154, 101, 59, 217, 135, 4, 90, 184, 230, 167, 249, 27, 69, 198, 152, 122, 36, 248, 166, 68, 26, 153, 199, 37, 123, 58, 100, 134, 216, 91, 5, 231, 185, 140, 210, 48, 110, 237, 179, 81, 15, 78, 16, 242, 172, 47, 113, 147, 205, 17, 79, 173, 243, 112, 46, 204, 146, 211, 141, 111, 49, 178, 236, 14, 80, 175, 241, 19, 77, 206, 144, 114, 44, 109, 51, 209, 143, 12, 82, 176, 238, 50, 108, 142, 208, 83, 13, 239, 177, 240, 174, 76, 18, 145, 207, 45, 115, 202, 148, 118, 40, 171, 245, 23, 73, 8, 86, 180, 234, 105, 55, 213, 139, 87, 9, 235, 181, 54, 104, 138, 212, 149, 203, 41, 119, 244, 170, 72, 22, 233, 183, 85, 11, 136, 214, 52, 106, 43, 117, 151, 201, 74, 20, 246, 168, 116, 42, 200, 150, 21, 75, 169, 247, 182, 232, 10, 84, 215, 137, 107, 53 }
+
 function crc8_854(dataBuf, start_pos, end_pos)
     local crc = 0
     for si = start_pos, end_pos do
@@ -1417,6 +1174,7 @@ function crc8_854(dataBuf, start_pos, end_pos)
     end
     return crc
 end
+
 function decode(cmd)
     local tb
     if JSON == nil then
@@ -1425,6 +1183,7 @@ function decode(cmd)
     tb = JSON.decode(cmd)
     return tb
 end
+
 function encode(luaTable)
     local jsonStr
     if JSON == nil then
@@ -1433,6 +1192,7 @@ function encode(luaTable)
     jsonStr = JSON.encode(luaTable)
     return jsonStr
 end
+
 function string2table(hexstr)
     local tb = {}
     local i = 1
@@ -1444,6 +1204,7 @@ function string2table(hexstr)
     end
     return tb
 end
+
 function string2hexstring(str)
     local ret = ''
     for i = 1, #str do
@@ -1451,6 +1212,7 @@ function string2hexstring(str)
     end
     return ret
 end
+
 function table2string(cmd)
     local ret = ''
     local i
@@ -1459,6 +1221,7 @@ function table2string(cmd)
     end
     return ret
 end
+
 function int2String(data)
     if (not data) then
         data = tostring(0)
@@ -1469,6 +1232,7 @@ function int2String(data)
     end
     return data
 end
+
 function string2Int(data)
     if (not data) then
         data = tonumber('0')
@@ -1479,6 +1243,7 @@ function string2Int(data)
     end
     return data
 end
+
 function checkBoundary(data, min, max)
     if (not data) then
         data = 0
@@ -1494,6 +1259,7 @@ function checkBoundary(data, min, max)
         end
     end
 end
+
 function print_lua_table(lua_table, indent)
     indent = indent or 0
     for k, v in pairs(lua_table) do

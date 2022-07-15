@@ -12,6 +12,7 @@ local KEY_TEMPERATURE = "temperature"
 local KEY_FURNACE_LIGHT = "furnace_light"
 local KEY_WATT = "watt"
 local KEY_WEIGHT = "weight"
+
 local VALUE_VERSION = 1
 local VALUE_ON = "on"
 local VALUE_OFF = "off"
@@ -27,11 +28,13 @@ local VALUE_WORK_STATUS_QUERY = "query"
 local VALUE_WORK_STATUS_DEMO = "demo"
 local VALUE_UNKNOWN = "unknown"
 local VALUE_INVALID = "invalid"
+
 local BYTE_DEVICE_TYPE = 0x9A
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERY_REQUEST = 0x03
 local BYTE_PROTOCOL_HEAD = 0xAA
 local BYTE_PROTOCOL_LENGTH = 0x0A
+
 local workstatus
 local mode = 0
 local hour = 0

@@ -10,6 +10,7 @@ local KEY_TEMPERATURE = 'temperature'
 local KEY_CURRENT_TEMPERATURE = 'cur_temperature'
 local KEY_WATER_LEVEL = 'heat_water_level'
 local KEY_ERROR_CODE = 'error_code'
+
 local VALUE_VERSION = 9
 local VALUE_FUNCTION_ON = 'on'
 local VALUE_FUNCTION_OFF = 'off'
@@ -36,6 +37,7 @@ local VALUE_MODE_NONE = 'none'
 local VALUE_HEAT_WHOLE = 'whole'
 local VALUE_HEAT_HALF = 'half'
 local VALUE_HEAT_NONE = 'none'
+
 local BYTE_DEVICE_TYPE = 0xE2
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERYL_REQUEST = 0x03
@@ -72,6 +74,7 @@ local BYTE_PROTECT_OFF = 0x00
 local BYTE_CMD_POWER_ON = 0x01
 local BYTE_CMD_POWER_OFF = 0x02
 local BYTE_CMD_OTHER = 0x04
+
 local powerValue
 local temperatureValue
 local modeValue1 = 0
@@ -91,6 +94,7 @@ local endTimeMinute = 0
 local hotPower = 0
 local warmPower = 0
 local fastHotPower = 0
+
 function jsonToModel(stateJson, controlJson)
     local oldState = stateJson
     local controlCmd = controlJson
@@ -194,6 +198,7 @@ function jsonToModel(stateJson, controlJson)
         end
     end
 end
+
 function binToModel(binData)
     if (#binData == 0) then
         return nil
@@ -224,6 +229,7 @@ function binToModel(binData)
     warmPower = bit.band(messageBytes[2], 0x08)
     fastHotPower = bit.band(messageBytes[2], 0x02)
 end
+
 function jsonToData(jsonCmd)
     if (#jsonCmd == 0) then
         return nil
@@ -272,6 +278,7 @@ function jsonToData(jsonCmd)
     ret = string2hexstring(ret)
     return ret
 end
+
 function getTotalMsg(bodyData, cType)
     local bodyLength = #bodyData
     local msgLength = bodyLength + BYTE_PROTOCOL_LENGTH + 1
@@ -293,6 +300,7 @@ function getTotalMsg(bodyData, cType)
     end
     return msgFinal
 end
+
 function dataToJson(jsonCmd)
     if (not jsonCmd) then
         return nil
@@ -325,12 +333,12 @@ function dataToJson(jsonCmd)
     if (sumRes ~= msgBytes[msgLength]) then
     end
     if
-        (((msgType == BYTE_CONTROL_REQUEST) and (msgSubType == 0x01)) or
+    (((msgType == BYTE_CONTROL_REQUEST) and (msgSubType == 0x01)) or
             ((msgType == BYTE_CONTROL_REQUEST) and (msgSubType == 0x02)) or
             ((msgType == BYTE_CONTROL_REQUEST) and (msgSubType == 0x04)) or
             ((msgType == BYTE_QUERYL_REQUEST) and (msgSubType == 0x01)) or
             ((msgType == BYTE_AUTO_REPORT) and (msgSubType == 0x01)))
-     then
+    then
         for i = 0, bodyLength do
             bodyBytes[i] = msgBytes[i + BYTE_PROTOCOL_LENGTH]
         end
@@ -449,6 +457,7 @@ function dataToJson(jsonCmd)
         return ret
     end
 end
+
 function print_lua_table(lua_table, indent)
     indent = indent or 0
     for k, v in pairs(lua_table) do
@@ -476,6 +485,7 @@ function print_lua_table(lua_table, indent)
         end
     end
 end
+
 function checkBoundary(data, min, max)
     if (not data) then
         data = 0
@@ -491,6 +501,7 @@ function checkBoundary(data, min, max)
         end
     end
 end
+
 function table2string(cmd)
     local ret = ''
     local i
@@ -499,6 +510,7 @@ function table2string(cmd)
     end
     return ret
 end
+
 function string2table(hexstr)
     local tb = {}
     local i = 1
@@ -510,6 +522,7 @@ function string2table(hexstr)
     end
     return tb
 end
+
 function string2hexstring(str)
     local ret = ''
     for i = 1, #str do
@@ -517,6 +530,7 @@ function string2hexstring(str)
     end
     return ret
 end
+
 function encode(cmd)
     local tb
     if JSON == nil then
@@ -525,6 +539,7 @@ function encode(cmd)
     tb = JSON.encode(cmd)
     return tb
 end
+
 function decode(cmd)
     local tb
     if JSON == nil then
@@ -533,6 +548,7 @@ function decode(cmd)
     tb = JSON.decode(cmd)
     return tb
 end
+
 function makeSum(tmpbuf, start_pos, end_pos)
     local resVal = 0
     for si = start_pos, end_pos do
@@ -544,264 +560,9 @@ function makeSum(tmpbuf, start_pos, end_pos)
     resVal = 255 - resVal + 1
     return resVal
 end
-local crc8_854_table = {
-    0,
-    94,
-    188,
-    226,
-    97,
-    63,
-    221,
-    131,
-    194,
-    156,
-    126,
-    32,
-    163,
-    253,
-    31,
-    65,
-    157,
-    195,
-    33,
-    127,
-    252,
-    162,
-    64,
-    30,
-    95,
-    1,
-    227,
-    189,
-    62,
-    96,
-    130,
-    220,
-    35,
-    125,
-    159,
-    193,
-    66,
-    28,
-    254,
-    160,
-    225,
-    191,
-    93,
-    3,
-    128,
-    222,
-    60,
-    98,
-    190,
-    224,
-    2,
-    92,
-    223,
-    129,
-    99,
-    61,
-    124,
-    34,
-    192,
-    158,
-    29,
-    67,
-    161,
-    255,
-    70,
-    24,
-    250,
-    164,
-    39,
-    121,
-    155,
-    197,
-    132,
-    218,
-    56,
-    102,
-    229,
-    187,
-    89,
-    7,
-    219,
-    133,
-    103,
-    57,
-    186,
-    228,
-    6,
-    88,
-    25,
-    71,
-    165,
-    251,
-    120,
-    38,
-    196,
-    154,
-    101,
-    59,
-    217,
-    135,
-    4,
-    90,
-    184,
-    230,
-    167,
-    249,
-    27,
-    69,
-    198,
-    152,
-    122,
-    36,
-    248,
-    166,
-    68,
-    26,
-    153,
-    199,
-    37,
-    123,
-    58,
-    100,
-    134,
-    216,
-    91,
-    5,
-    231,
-    185,
-    140,
-    210,
-    48,
-    110,
-    237,
-    179,
-    81,
-    15,
-    78,
-    16,
-    242,
-    172,
-    47,
-    113,
-    147,
-    205,
-    17,
-    79,
-    173,
-    243,
-    112,
-    46,
-    204,
-    146,
-    211,
-    141,
-    111,
-    49,
-    178,
-    236,
-    14,
-    80,
-    175,
-    241,
-    19,
-    77,
-    206,
-    144,
-    114,
-    44,
-    109,
-    51,
-    209,
-    143,
-    12,
-    82,
-    176,
-    238,
-    50,
-    108,
-    142,
-    208,
-    83,
-    13,
-    239,
-    177,
-    240,
-    174,
-    76,
-    18,
-    145,
-    207,
-    45,
-    115,
-    202,
-    148,
-    118,
-    40,
-    171,
-    245,
-    23,
-    73,
-    8,
-    86,
-    180,
-    234,
-    105,
-    55,
-    213,
-    139,
-    87,
-    9,
-    235,
-    181,
-    54,
-    104,
-    138,
-    212,
-    149,
-    203,
-    41,
-    119,
-    244,
-    170,
-    72,
-    22,
-    233,
-    183,
-    85,
-    11,
-    136,
-    214,
-    52,
-    106,
-    43,
-    117,
-    151,
-    201,
-    74,
-    20,
-    246,
-    168,
-    116,
-    42,
-    200,
-    150,
-    21,
-    75,
-    169,
-    247,
-    182,
-    232,
-    10,
-    84,
-    215,
-    137,
-    107,
-    53
-}
+
+local crc8_854_table = { 0, 94, 188, 226, 97, 63, 221, 131, 194, 156, 126, 32, 163, 253, 31, 65, 157, 195, 33, 127, 252, 162, 64, 30, 95, 1, 227, 189, 62, 96, 130, 220, 35, 125, 159, 193, 66, 28, 254, 160, 225, 191, 93, 3, 128, 222, 60, 98, 190, 224, 2, 92, 223, 129, 99, 61, 124, 34, 192, 158, 29, 67, 161, 255, 70, 24, 250, 164, 39, 121, 155, 197, 132, 218, 56, 102, 229, 187, 89, 7, 219, 133, 103, 57, 186, 228, 6, 88, 25, 71, 165, 251, 120, 38, 196, 154, 101, 59, 217, 135, 4, 90, 184, 230, 167, 249, 27, 69, 198, 152, 122, 36, 248, 166, 68, 26, 153, 199, 37, 123, 58, 100, 134, 216, 91, 5, 231, 185, 140, 210, 48, 110, 237, 179, 81, 15, 78, 16, 242, 172, 47, 113, 147, 205, 17, 79, 173, 243, 112, 46, 204, 146, 211, 141, 111, 49, 178, 236, 14, 80, 175, 241, 19, 77, 206, 144, 114, 44, 109, 51, 209, 143, 12, 82, 176, 238, 50, 108, 142, 208, 83, 13, 239, 177, 240, 174, 76, 18, 145, 207, 45, 115, 202, 148, 118, 40, 171, 245, 23, 73, 8, 86, 180, 234, 105, 55, 213, 139, 87, 9, 235, 181, 54, 104, 138, 212, 149, 203, 41, 119, 244, 170, 72, 22, 233, 183, 85, 11, 136, 214, 52, 106, 43, 117, 151, 201, 74, 20, 246, 168, 116, 42, 200, 150, 21, 75, 169, 247, 182, 232, 10, 84, 215, 137, 107, 53 }
+
 function crc8_854(dataBuf, start_pos, end_pos)
     local crc = 0
     for si = start_pos, end_pos do

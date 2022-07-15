@@ -16,6 +16,7 @@ local KEY_DRY = "dry"
 local KEY_PTC = "ptc"
 local KEY_ERROR_CODE = "error_code"
 local KEY_BUZZER = "buzzer"
+
 local VALUE_VERSION = 22
 local VALUE_FUNCTION_ON = "on"
 local VALUE_FUNCTION_OFF = "off"
@@ -29,8 +30,10 @@ local VALUE_OUTDOOR_TEMPERATURE = "outdoor_temperature"
 local VALUE_RUN_STATE = "runstate"
 local VALUE_RUNNING = "running"
 local VALUE_STOP = "stopped"
+
 local deviceSubType = 0
 local deviceSN8 = "00000000"
+
 local BYTE_DEVICE_TYPE = 0xAC
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERYL_REQUEST = 0x03
@@ -77,6 +80,7 @@ local BYTE_STRONG_WIND_ON = 0x20
 local BYTE_STRONG_WIND_OFF = 0x00
 local BYTE_SLEEP_ON = 0x03
 local BYTE_SLEEP_OFF = 0x00
+
 local powerValue = 0
 local modeValue = 0
 local temperatureValue = 0

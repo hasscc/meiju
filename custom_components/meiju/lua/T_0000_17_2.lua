@@ -8,17 +8,20 @@ local KEY_DRY = "dry"
 local KEY_ANION = "anion"
 local KEY_BAKING = "baking"
 local KEY_ERROR_CODE = "error_code"
+
 local VALUE_VERSION = 2
 local VALUE_ON = "on"
 local VALUE_OFF = "off"
 local VALUE_UP = "up"
 local VALUE_DOWN = "down"
 local VALUE_PAUSE = "pause"
+
 local DEVICE_TYPE = 0x17
 local DEVICE_CONTROL_REQUEST = 0x02
 local DEVICE_QUERY_REQUEST = 0x03
 local DEVICE_PROTOCOL_HEAD = 0xAA
 local DEVICE_PROTOCOL_LENGTH = 0x0A
+
 local POWER_ON = 0x01
 local POWER_OFF = 0x00
 local UPDOWN_PAUSE = 0x00
@@ -34,6 +37,7 @@ local ANION_ON = 0x01
 local ANION_OFF = 0x00
 local BAKING_ON = 0x01
 local BAKING_OFF = 0x00
+
 local byte0 = 0
 local byte1 = 0
 local byte2 = 0

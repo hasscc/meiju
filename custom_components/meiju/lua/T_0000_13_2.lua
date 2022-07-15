@@ -4,10 +4,12 @@ local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERY_REQUEST = 0x03
 local BYTE_PROTOCOL_HEAD = 0xAA
 local BYTE_PROTOCOL_LENGTH = 0x0A
+
 local VALUE_UNKNOWN = "unknown"
 local VALUE_INVALID = "invalid"
 local dataType = 0
 local cmdType = 0
+
 local KEY_VERSION = "version"
 local KEY_POWER = "power"
 local KEY_SCENE_LIGHT = "scene_light"
@@ -25,6 +27,7 @@ local KEY_FILM_BRIGHTNESS = "film_brightness"
 local KEY_LIGHT_COLOR_TEMPERATURE = "light_color_temperature"
 local KEY_LIGHT_BRIGHTNESS = "light_brightness"
 local KEY_RESULT = "result"
+
 local powerValue = 0
 local sceneLight = 0
 local colorTemperature = 0

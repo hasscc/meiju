@@ -24,6 +24,7 @@ local KEY_EVAPORATOR_ENTRANCE_TEMPERATURE = 'evaporator_entrance_temperature'
 local KEY_EVAPORATOR_EXIT_TEMPERATURE = 'evaporator_exit_temperature'
 local KEY_ERROR_FROM_MACHINE_STYLE = 'error_from_machine_style'
 local KEY_ERROR_CODE = 'error_code'
+
 local VALUE_VERSION = '6'
 local VALUE_CMD_COMMON = 'cmd_common'
 local VALUE_CMD_LOCK = 'cmd_lock'
@@ -64,6 +65,7 @@ local VALUE_SWING_LR_SITE5 = 'swing_lr_site_5'
 local VALUE_SWING_LR_SITE6 = 'swing_lr_site_6'
 local VALUE_ERROR_FROM_OUTSIDE_MACHINE = 'error_from_outside_machine'
 local VALUE_ERROR_FROM_INSIDE_MACHINE = 'error_from_inside_machine'
+
 local BYTE_DEVICE_TYPE = 0xCC
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERY_STATUS_REQUEST = 0x03
@@ -122,6 +124,7 @@ local BYTE_SLEEP_ON = 0x10
 local BYTE_SLEEP_OFF = 0x00
 local BYTE_DIGIT_DISPLAY_ON = 0x08
 local BYTE_DIGIT_DISPLAY_OFF = 0x00
+
 local cmdType
 local powerValue
 local modeValue
@@ -152,6 +155,7 @@ local errorLow
 local errorCode = 0
 local isCanDecimals = 0
 local dataType = 0
+
 function jsonToModel(jsonCmd)
     local streams = jsonCmd
     if (streams[KEY_CMD_TYPE] == VALUE_CMD_COMMON) then
@@ -324,6 +328,7 @@ local function binToModel(binData)
         end
     end
 end
+
 function jsonToData(jsonCmd)
     if (#jsonCmd == 0) then
         return nil
@@ -368,16 +373,14 @@ function jsonToData(jsonCmd)
             closeTime = 0
         end
         bodyBytes[5] = math.floor(closeTime / 15)
-        bodyBytes[6] =
-            bit.bor(
-            bit.bor(bit.band(ecoValue, 0x01), bit.band(swingUDSwitchValue, 0x04)),
-            bit.bor(bit.band(exhaustValue, 0x08), bit.band(PTCSettingValue, 0x30))
+        bodyBytes[6] = bit.bor(
+                bit.bor(bit.band(ecoValue, 0x01), bit.band(swingUDSwitchValue, 0x04)),
+                bit.bor(bit.band(exhaustValue, 0x08), bit.band(PTCSettingValue, 0x30))
         )
         bodyBytes[7] = 0xFF
-        bodyBytes[8] =
-            bit.bor(
-            bit.bor(bit.band(sleepSwitchValue, 0x10), bit.band(digitDisplaySwitchValue, 0x08)),
-            bit.band(swingLRSwitchValue, 0x01)
+        bodyBytes[8] = bit.bor(
+                bit.bor(bit.band(sleepSwitchValue, 0x10), bit.band(digitDisplaySwitchValue, 0x08)),
+                bit.band(swingLRSwitchValue, 0x01)
         )
         bodyBytes[9] = swingLRSiteValue
         bodyBytes[10] = swingUDSiteValue
@@ -391,6 +394,7 @@ function jsonToData(jsonCmd)
     ret = string2hexstring(ret)
     return ret
 end
+
 function getTotalMsg(bodyData, cType)
     local bodyLength = #bodyData
     local msgLength = bodyLength + BYTE_PROTOCOL_LENGTH + 1
@@ -412,6 +416,7 @@ function getTotalMsg(bodyData, cType)
     end
     return msgFinal
 end
+
 function dataToJson(jsonCmd)
     if (not jsonCmd) then
         return nil
@@ -588,6 +593,7 @@ function dataToJson(jsonCmd)
     local ret = encode(retTable)
     return ret
 end
+
 function print_lua_table(lua_table, indent)
     indent = indent or 0
     for k, v in pairs(lua_table) do
@@ -615,6 +621,7 @@ function print_lua_table(lua_table, indent)
         end
     end
 end
+
 function checkBoundary(data, min, max)
     if (not data) then
         data = 0
@@ -633,6 +640,7 @@ function checkBoundary(data, min, max)
         end
     end
 end
+
 function string2Int(data)
     if (not data) then
         data = tonumber('0')
@@ -643,6 +651,7 @@ function string2Int(data)
     end
     return data
 end
+
 function int2String(data)
     if (not data) then
         data = tostring(0)
@@ -653,6 +662,7 @@ function int2String(data)
     end
     return data
 end
+
 function table2string(cmd)
     local ret = ''
     local i
@@ -661,6 +671,7 @@ function table2string(cmd)
     end
     return ret
 end
+
 function string2table(hexstr)
     local tb = {}
     local i = 1
@@ -672,6 +683,7 @@ function string2table(hexstr)
     end
     return tb
 end
+
 function string2hexstring(str)
     local ret = ''
     for i = 1, #str do
@@ -679,6 +691,7 @@ function string2hexstring(str)
     end
     return ret
 end
+
 function encode(cmd)
     local tb
     if JSON == nil then
@@ -687,6 +700,7 @@ function encode(cmd)
     tb = JSON.encode(cmd)
     return tb
 end
+
 function decode(cmd)
     local tb
     if JSON == nil then
@@ -695,6 +709,7 @@ function decode(cmd)
     tb = JSON.decode(cmd)
     return tb
 end
+
 function makeSum(tmpbuf, start_pos, end_pos)
     local resVal = 0
     for si = start_pos, end_pos do

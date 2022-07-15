@@ -6,6 +6,7 @@ local KEY_SET_HUMIDITY = "humidity"
 local KEY_TANK_STATUS = "tank_status"
 local KEY_CUR_HUMIDITY = "cur_humidity"
 local KEY_ERROR_CODE = "error_code"
+
 local VALUE_VERSION = 6
 local VALUE_ON = "on"
 local VALUE_OFF = "off"
@@ -13,6 +14,7 @@ local VALUE_FANSPEED_HIGH = "high"
 local VALUE_FANSPEED_MID = "middle"
 local VALUE_FANSPEED_LOW = "low"
 local VALUE_FANSPEED_AUTO = "auto"
+
 local BYTE_DEVICE_TYPE = 0xFD
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERY_REQUEST = 0x03
@@ -26,6 +28,7 @@ local BYTE_FANSPEED_LOW = 0x28
 local BYTE_FANSPEED_AUTO = 0x66
 local BYTE_BUZZER_ON = 0x40
 local BYTE_BUZZER_OFF = 0x00
+
 local powerValue = 0
 local setHumidityValue = 0
 local fanspeedValue = 0

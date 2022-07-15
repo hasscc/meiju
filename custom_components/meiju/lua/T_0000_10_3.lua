@@ -1,9 +1,11 @@
 local JSON = require "cjson"
 local KEY_VERSION = "version"
 local KEY_POWER = "power"
+
 local VALUE_VERSION = 3
 local VALUE_POWER_ON = "on"
 local VALUE_POWER_OFF = "off"
+
 local BYTE_DEVICE_TYPE = 0x10
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERY_REQUEST = 0x03
@@ -11,6 +13,7 @@ local BYTE_PROTOCOL_HEAD = 0xAA
 local BYTE_PROTOCOL_LENGTH = 0x0A
 local BYTE_POWER_ON = 0x01
 local BYTE_POWER_OFF = 0x00
+
 local powerValue
 
 function jsonToModel(jsonCmd)

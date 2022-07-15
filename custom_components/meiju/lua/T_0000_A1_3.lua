@@ -7,6 +7,7 @@ local KEY_ANION = "anion"
 local KEY_HUMIDITY = "humidity"
 local KEY_TANK_STATUS = "tank_status"
 local KEY_CURRENT_HUMIDITY = "cur_humidity"
+
 local VALUE_VERSION = 3
 local VALUE_POWER_ON = "on"
 local VALUE_POWER_OFF = "off"
@@ -16,6 +17,7 @@ local VALUE_MODE_CONTINUITY = "continuity"
 local VALUE_MODE_AUTO = "auto"
 local VALUE_MODE_DRY_CLOTHES = "dry_clothes"
 local VALUE_MODE_DRY_SHOES = "dry_shoes"
+
 local BYTE_DEVICE_TYPE = 0xA1
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERY_REQUEST = 0x03
@@ -33,6 +35,7 @@ local BYTE_ANION_ON = 0x40
 local BYTE_ANION_OFF = 0x00
 local BYTE_BUZZER_ON = 0x40
 local BYTE_BUZZER_OFF = 0x00
+
 local powerValue
 local modeValue
 local windSpeedValue

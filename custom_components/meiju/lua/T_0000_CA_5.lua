@@ -6,6 +6,7 @@ local BYTE_MSG_TYPE_CONTROL = 0x02
 local BYTE_MSG_TYPE_QUERY = 0x03
 local BYTE_PROTOCOL_HEAD = 0xAA
 local BYTE_PROTOCOL_HEAD_LENGTH = 0x0A
+
 local codeMode
 local freezingMode
 local smartMode
@@ -80,6 +81,7 @@ local functionZoneLevel
 local humiditySetting
 local smartHumidity
 local dataType = 0
+
 function jsonToModel(jsonCmd)
     local streams = jsonCmd
     if (streams['storage_mode'] == 'on') then
@@ -289,15 +291,16 @@ function jsonToModel(jsonCmd)
         smartHumidity = 0x00
     end
 end
+
 function binToModel(binData)
     if (#binData < 11) then
         return nil
     end
     local messageBytes = binData
     if
-        ((dataType == 0x02 and messageBytes[0] == 0x00) or (dataType == 0x03 and messageBytes[0] == 0x00) or
+    ((dataType == 0x02 and messageBytes[0] == 0x00) or (dataType == 0x03 and messageBytes[0] == 0x00) or
             (dataType == 0x04 and messageBytes[0] == 0x02))
-     then
+    then
         codeMode = bit.band(messageBytes[1], 0x01)
         freezingMode = bit.band(messageBytes[1], 0x02)
         smartMode = bit.band(messageBytes[1], 0x04)
@@ -377,6 +380,7 @@ function binToModel(binData)
         end
     end
 end
+
 function jsonToData(jsonCmd)
     if (#jsonCmd == 0) then
         return nil
@@ -404,72 +408,67 @@ function jsonToData(jsonCmd)
             bodyBytes[i] = 0
         end
         bodyBytes[0] = 0x00
-        bodyBytes[1] =
-            bit.bor(
-            bit.bor(
+        bodyBytes[1] = bit.bor(
                 bit.bor(
-                    bit.bor(
                         bit.bor(
-                            bit.bor(
-                                bit.bor(bit.band(codeMode, 0x01), bit.band(freezingMode, 0x02)),
-                                bit.band(smartMode, 0x04)
-                            ),
-                            bit.band(energySavingMode, 0x08)
+                                bit.bor(
+                                        bit.bor(
+                                                bit.bor(
+                                                        bit.bor(bit.band(codeMode, 0x01), bit.band(freezingMode, 0x02)),
+                                                        bit.band(smartMode, 0x04)
+                                                ),
+                                                bit.band(energySavingMode, 0x08)
+                                        ),
+                                        bit.band(holidayMode, 0x10)
+                                ),
+                                bit.band(moisturizeMode, 0x20)
                         ),
-                        bit.band(holidayMode, 0x10)
-                    ),
-                    bit.band(moisturizeMode, 0x20)
+                        bit.band(preservationMode, 0x40)
                 ),
-                bit.band(preservationMode, 0x40)
-            ),
-            bit.band(acmeFreezingMode, 0x80)
+                bit.band(acmeFreezingMode, 0x80)
         )
-        bodyBytes[2] =
-            bit.bor(bit.lshift(bit.band(freezingTemperature, 0x0F), 4), bit.band(refrigerationTemperature, 0x0F))
+        bodyBytes[2] = bit.bor(bit.lshift(bit.band(freezingTemperature, 0x0F), 4), bit.band(refrigerationTemperature, 0x0F))
         bodyBytes[3] = lVariableTemperature
         bodyBytes[4] = rVariableTemperature
         bodyBytes[5] = variableModeValue
-        bodyBytes[6] =
-            bit.bor(
-            bit.bor(
+        bodyBytes[6] = bit.bor(
                 bit.bor(
-                    bit.bor(bit.band(refrigerationPowerValue, 0x01), bit.band(lVariablePowerValue, 0x04)),
-                    bit.band(rVariablePowerValue, 0x08)
-                ),
-                bit.band(freezingPowerValue, 0x10)
-            ),
-            bit.band(allRefrigerationPower, 0x80)
-        )
-        bodyBytes[7] =
-            bit.bor(
-            bit.bor(
-                bit.bor(
-                    bit.bor(bit.bor(bit.band(removeDew, 0x01), bit.band(humidify, 0x02)), bit.band(unfreeze, 0x04)),
-                    bit.band(temperatureUnit, 0x08)
-                ),
-                bit.band(floodlight, 0x10)
-            ),
-            bit.band(functionSwitch, 0xC0)
-        )
-        bodyBytes[8] =
-            bit.bor(
-            bit.bor(
-                bit.bor(
-                    bit.bor(
                         bit.bor(
-                            bit.bor(
-                                bit.bor(bit.band(radarMode, 0x01), bit.band(milkMode, 0x02)),
-                                bit.band(icedMode, 0x04)
-                            ),
-                            bit.band(plasmaAsepticMode, 0x08)
+                                bit.bor(bit.band(refrigerationPowerValue, 0x01), bit.band(lVariablePowerValue, 0x04)),
+                                bit.band(rVariablePowerValue, 0x08)
                         ),
-                        bit.band(acquireIceaMode, 0x10)
-                    ),
-                    bit.band(brashIceaMode, 0x20)
+                        bit.band(freezingPowerValue, 0x10)
                 ),
-                bit.band(acquireWaterMode, 0x40)
-            ),
-            bit.band(iceMachinePower, 0x80)
+                bit.band(allRefrigerationPower, 0x80)
+        )
+        bodyBytes[7] = bit.bor(
+                bit.bor(
+                        bit.bor(
+                                bit.bor(bit.bor(bit.band(removeDew, 0x01), bit.band(humidify, 0x02)), bit.band(unfreeze, 0x04)),
+                                bit.band(temperatureUnit, 0x08)
+                        ),
+                        bit.band(floodlight, 0x10)
+                ),
+                bit.band(functionSwitch, 0xC0)
+        )
+        bodyBytes[8] = bit.bor(
+                bit.bor(
+                        bit.bor(
+                                bit.bor(
+                                        bit.bor(
+                                                bit.bor(
+                                                        bit.bor(bit.band(radarMode, 0x01), bit.band(milkMode, 0x02)),
+                                                        bit.band(icedMode, 0x04)
+                                                ),
+                                                bit.band(plasmaAsepticMode, 0x08)
+                                        ),
+                                        bit.band(acquireIceaMode, 0x10)
+                                ),
+                                bit.band(brashIceaMode, 0x20)
+                        ),
+                        bit.band(acquireWaterMode, 0x40)
+                ),
+                bit.band(iceMachinePower, 0x80)
         )
         bodyBytes[16] = bit.band(intervalRoomTemperatureLevel, 0xFE)
         if (foodSite ~= nil) then
@@ -493,6 +492,7 @@ function jsonToData(jsonCmd)
     ret = string2hexstring(ret)
     return ret
 end
+
 function getTotalMsg(bodyData, cType)
     local bodyLength = #bodyData
     local msgLength = bodyLength + BYTE_PROTOCOL_HEAD_LENGTH + 1
@@ -515,6 +515,7 @@ function getTotalMsg(bodyData, cType)
     end
     return msgFinal
 end
+
 function dataToJson(jsonCmd)
     if (not jsonCmd) then
         return nil
@@ -548,9 +549,9 @@ function dataToJson(jsonCmd)
     local streams = {}
     streams[KEY_VERSION] = VALUE_VERSION
     if
-        ((dataType == 0x02 and bodyBytes[0] == 0x00) or (dataType == 0x03 and bodyBytes[0] == 0x00) or
+    ((dataType == 0x02 and bodyBytes[0] == 0x00) or (dataType == 0x03 and bodyBytes[0] == 0x00) or
             (dataType == 0x04 and bodyBytes[0] == 0x02))
-     then
+    then
         if (codeMode == 0x01) then
             streams['storage_mode'] = 'on'
         elseif (codeMode == 0x00) then
@@ -864,6 +865,7 @@ function dataToJson(jsonCmd)
     local ret = encode(retTable)
     return ret
 end
+
 function print_lua_table(lua_table, indent)
     indent = indent or 0
     for k, v in pairs(lua_table) do
@@ -891,6 +893,7 @@ function print_lua_table(lua_table, indent)
         end
     end
 end
+
 function checkBoundary(data, min, max)
     if (not data) then
         data = 0
@@ -909,6 +912,7 @@ function checkBoundary(data, min, max)
         end
     end
 end
+
 function string2Int(data)
     if (not data) then
         data = tonumber('0')
@@ -919,6 +923,7 @@ function string2Int(data)
     end
     return data
 end
+
 function int2String(data)
     if (not data) then
         data = tostring(0)
@@ -929,6 +934,7 @@ function int2String(data)
     end
     return data
 end
+
 function table2string(cmd)
     local ret = ''
     local i
@@ -937,6 +943,7 @@ function table2string(cmd)
     end
     return ret
 end
+
 function string2table(hexstr)
     local tb = {}
     local i = 1
@@ -948,6 +955,7 @@ function string2table(hexstr)
     end
     return tb
 end
+
 function string2hexstring(str)
     local ret = ''
     for i = 1, #str do
@@ -955,6 +963,7 @@ function string2hexstring(str)
     end
     return ret
 end
+
 function encode(cmd)
     local tb
     if JSON == nil then
@@ -963,6 +972,7 @@ function encode(cmd)
     tb = JSON.encode(cmd)
     return tb
 end
+
 function decode(cmd)
     local tb
     if JSON == nil then
@@ -971,6 +981,7 @@ function decode(cmd)
     tb = JSON.decode(cmd)
     return tb
 end
+
 function makeSum(tmpbuf, start_pos, end_pos)
     local resVal = 0
     for si = start_pos, end_pos do
@@ -982,264 +993,9 @@ function makeSum(tmpbuf, start_pos, end_pos)
     resVal = 255 - resVal + 1
     return resVal
 end
-local crc8_854_table = {
-    0,
-    94,
-    188,
-    226,
-    97,
-    63,
-    221,
-    131,
-    194,
-    156,
-    126,
-    32,
-    163,
-    253,
-    31,
-    65,
-    157,
-    195,
-    33,
-    127,
-    252,
-    162,
-    64,
-    30,
-    95,
-    1,
-    227,
-    189,
-    62,
-    96,
-    130,
-    220,
-    35,
-    125,
-    159,
-    193,
-    66,
-    28,
-    254,
-    160,
-    225,
-    191,
-    93,
-    3,
-    128,
-    222,
-    60,
-    98,
-    190,
-    224,
-    2,
-    92,
-    223,
-    129,
-    99,
-    61,
-    124,
-    34,
-    192,
-    158,
-    29,
-    67,
-    161,
-    255,
-    70,
-    24,
-    250,
-    164,
-    39,
-    121,
-    155,
-    197,
-    132,
-    218,
-    56,
-    102,
-    229,
-    187,
-    89,
-    7,
-    219,
-    133,
-    103,
-    57,
-    186,
-    228,
-    6,
-    88,
-    25,
-    71,
-    165,
-    251,
-    120,
-    38,
-    196,
-    154,
-    101,
-    59,
-    217,
-    135,
-    4,
-    90,
-    184,
-    230,
-    167,
-    249,
-    27,
-    69,
-    198,
-    152,
-    122,
-    36,
-    248,
-    166,
-    68,
-    26,
-    153,
-    199,
-    37,
-    123,
-    58,
-    100,
-    134,
-    216,
-    91,
-    5,
-    231,
-    185,
-    140,
-    210,
-    48,
-    110,
-    237,
-    179,
-    81,
-    15,
-    78,
-    16,
-    242,
-    172,
-    47,
-    113,
-    147,
-    205,
-    17,
-    79,
-    173,
-    243,
-    112,
-    46,
-    204,
-    146,
-    211,
-    141,
-    111,
-    49,
-    178,
-    236,
-    14,
-    80,
-    175,
-    241,
-    19,
-    77,
-    206,
-    144,
-    114,
-    44,
-    109,
-    51,
-    209,
-    143,
-    12,
-    82,
-    176,
-    238,
-    50,
-    108,
-    142,
-    208,
-    83,
-    13,
-    239,
-    177,
-    240,
-    174,
-    76,
-    18,
-    145,
-    207,
-    45,
-    115,
-    202,
-    148,
-    118,
-    40,
-    171,
-    245,
-    23,
-    73,
-    8,
-    86,
-    180,
-    234,
-    105,
-    55,
-    213,
-    139,
-    87,
-    9,
-    235,
-    181,
-    54,
-    104,
-    138,
-    212,
-    149,
-    203,
-    41,
-    119,
-    244,
-    170,
-    72,
-    22,
-    233,
-    183,
-    85,
-    11,
-    136,
-    214,
-    52,
-    106,
-    43,
-    117,
-    151,
-    201,
-    74,
-    20,
-    246,
-    168,
-    116,
-    42,
-    200,
-    150,
-    21,
-    75,
-    169,
-    247,
-    182,
-    232,
-    10,
-    84,
-    215,
-    137,
-    107,
-    53
-}
+
+local crc8_854_table = { 0, 94, 188, 226, 97, 63, 221, 131, 194, 156, 126, 32, 163, 253, 31, 65, 157, 195, 33, 127, 252, 162, 64, 30, 95, 1, 227, 189, 62, 96, 130, 220, 35, 125, 159, 193, 66, 28, 254, 160, 225, 191, 93, 3, 128, 222, 60, 98, 190, 224, 2, 92, 223, 129, 99, 61, 124, 34, 192, 158, 29, 67, 161, 255, 70, 24, 250, 164, 39, 121, 155, 197, 132, 218, 56, 102, 229, 187, 89, 7, 219, 133, 103, 57, 186, 228, 6, 88, 25, 71, 165, 251, 120, 38, 196, 154, 101, 59, 217, 135, 4, 90, 184, 230, 167, 249, 27, 69, 198, 152, 122, 36, 248, 166, 68, 26, 153, 199, 37, 123, 58, 100, 134, 216, 91, 5, 231, 185, 140, 210, 48, 110, 237, 179, 81, 15, 78, 16, 242, 172, 47, 113, 147, 205, 17, 79, 173, 243, 112, 46, 204, 146, 211, 141, 111, 49, 178, 236, 14, 80, 175, 241, 19, 77, 206, 144, 114, 44, 109, 51, 209, 143, 12, 82, 176, 238, 50, 108, 142, 208, 83, 13, 239, 177, 240, 174, 76, 18, 145, 207, 45, 115, 202, 148, 118, 40, 171, 245, 23, 73, 8, 86, 180, 234, 105, 55, 213, 139, 87, 9, 235, 181, 54, 104, 138, 212, 149, 203, 41, 119, 244, 170, 72, 22, 233, 183, 85, 11, 136, 214, 52, 106, 43, 117, 151, 201, 74, 20, 246, 168, 116, 42, 200, 150, 21, 75, 169, 247, 182, 232, 10, 84, 215, 137, 107, 53 }
+
 function crc8_854(dataBuf, start_pos, end_pos)
     local crc = 0
     for si = start_pos, end_pos do

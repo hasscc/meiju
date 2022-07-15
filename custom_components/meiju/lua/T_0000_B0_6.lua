@@ -21,6 +21,7 @@ local KEY_TEMP_PURE_FERMENT = 'temp_pure_ferment'
 local KEY_TEMP_FAST_STEAM = 'temp_fast_steam'
 local KEY_CLEAN_TYPE = 'clean_type'
 local KEY_MAINTAIN = 'maintain'
+
 local VALUE_VERSION = 6
 local VALUE_ON = 'on'
 local VALUE_OFF = 'off'
@@ -51,6 +52,7 @@ local VALUE_MODE_WARM = 'warm'
 local VALUE_MODE_PRE_HOT = 'pre_hot'
 local VALUE_MODE_FAST_BAKING = 'fast_baking'
 local VALUE_MODE_BRITTLE = 'brittle'
+
 local BYTE_DEVICE_TYPE = 0xB0
 local BYTE_CONTROL_REQUEST = 0x02
 local BYTE_QUERY_REQUEST = 0x03
@@ -87,6 +89,7 @@ local BYTE_MODE_FAST_BAKING = 0x43
 local BYTE_MODE_BRITTLE = 0x44
 local BYTE_LOCK_ON = 0x05
 local BYTE_LOCK_OFF = 0x01
+
 local workStatus = 0
 local mode = 0
 local minutes = 0
@@ -106,6 +109,7 @@ local cleanType = 0
 local maintain = 0
 local dataType = 0
 local deviceSubType = 0
+
 function updateGlobalPropertyValueByJson(luaTable)
     if luaTable[KEY_POWER] == VALUE_ON then
         workStatus = BYTE_POWER_ON
@@ -190,6 +194,7 @@ function updateGlobalPropertyValueByJson(luaTable)
         second = checkBoundary(luaTable[KEY_SECOND], 0, 59)
     end
 end
+
 function updateGlobalPropertyValueByByte(messageBytes)
     if #messageBytes >= 15 then
         workStatus = bit.band(messageBytes[0], 0x7F)
@@ -225,6 +230,7 @@ function updateGlobalPropertyValueByByte(messageBytes)
         end
     end
 end
+
 function assembleJsonByGlobalProperty()
     local streams = {}
     streams[KEY_VERSION] = VALUE_VERSION
@@ -437,6 +443,7 @@ function assembleJsonByGlobalProperty()
     end
     return streams
 end
+
 function jsonToData(jsonCmdStr)
     if (#jsonCmdStr == 0) then
         return nil
@@ -497,6 +504,7 @@ function jsonToData(jsonCmdStr)
     ret = string2hexstring(ret)
     return ret
 end
+
 function dataToJson(jsonStr)
     if (not jsonStr) then
         return nil
@@ -519,6 +527,7 @@ function dataToJson(jsonStr)
     local ret = encodeTableToJson(retTable)
     return ret
 end
+
 function extractBodyBytes(byteData)
     local msgLength = #byteData
     local msgBytes = {}
@@ -532,6 +541,7 @@ function extractBodyBytes(byteData)
     end
     return bodyBytes
 end
+
 function assembleUart(bodyBytes, type)
     local bodyLength = #bodyBytes + 1
     if bodyLength == 0 then
@@ -552,6 +562,7 @@ function assembleUart(bodyBytes, type)
     msgBytes[msgLength - 1] = makeSum(msgBytes, 1, msgLength - 2)
     return msgBytes
 end
+
 function makeSum(tmpbuf, start_pos, end_pos)
     local resVal = 0
     for si = start_pos, end_pos do
@@ -563,264 +574,9 @@ function makeSum(tmpbuf, start_pos, end_pos)
     resVal = 255 - resVal + 1
     return resVal
 end
-local crc8_854_table = {
-    0,
-    94,
-    188,
-    226,
-    97,
-    63,
-    221,
-    131,
-    194,
-    156,
-    126,
-    32,
-    163,
-    253,
-    31,
-    65,
-    157,
-    195,
-    33,
-    127,
-    252,
-    162,
-    64,
-    30,
-    95,
-    1,
-    227,
-    189,
-    62,
-    96,
-    130,
-    220,
-    35,
-    125,
-    159,
-    193,
-    66,
-    28,
-    254,
-    160,
-    225,
-    191,
-    93,
-    3,
-    128,
-    222,
-    60,
-    98,
-    190,
-    224,
-    2,
-    92,
-    223,
-    129,
-    99,
-    61,
-    124,
-    34,
-    192,
-    158,
-    29,
-    67,
-    161,
-    255,
-    70,
-    24,
-    250,
-    164,
-    39,
-    121,
-    155,
-    197,
-    132,
-    218,
-    56,
-    102,
-    229,
-    187,
-    89,
-    7,
-    219,
-    133,
-    103,
-    57,
-    186,
-    228,
-    6,
-    88,
-    25,
-    71,
-    165,
-    251,
-    120,
-    38,
-    196,
-    154,
-    101,
-    59,
-    217,
-    135,
-    4,
-    90,
-    184,
-    230,
-    167,
-    249,
-    27,
-    69,
-    198,
-    152,
-    122,
-    36,
-    248,
-    166,
-    68,
-    26,
-    153,
-    199,
-    37,
-    123,
-    58,
-    100,
-    134,
-    216,
-    91,
-    5,
-    231,
-    185,
-    140,
-    210,
-    48,
-    110,
-    237,
-    179,
-    81,
-    15,
-    78,
-    16,
-    242,
-    172,
-    47,
-    113,
-    147,
-    205,
-    17,
-    79,
-    173,
-    243,
-    112,
-    46,
-    204,
-    146,
-    211,
-    141,
-    111,
-    49,
-    178,
-    236,
-    14,
-    80,
-    175,
-    241,
-    19,
-    77,
-    206,
-    144,
-    114,
-    44,
-    109,
-    51,
-    209,
-    143,
-    12,
-    82,
-    176,
-    238,
-    50,
-    108,
-    142,
-    208,
-    83,
-    13,
-    239,
-    177,
-    240,
-    174,
-    76,
-    18,
-    145,
-    207,
-    45,
-    115,
-    202,
-    148,
-    118,
-    40,
-    171,
-    245,
-    23,
-    73,
-    8,
-    86,
-    180,
-    234,
-    105,
-    55,
-    213,
-    139,
-    87,
-    9,
-    235,
-    181,
-    54,
-    104,
-    138,
-    212,
-    149,
-    203,
-    41,
-    119,
-    244,
-    170,
-    72,
-    22,
-    233,
-    183,
-    85,
-    11,
-    136,
-    214,
-    52,
-    106,
-    43,
-    117,
-    151,
-    201,
-    74,
-    20,
-    246,
-    168,
-    116,
-    42,
-    200,
-    150,
-    21,
-    75,
-    169,
-    247,
-    182,
-    232,
-    10,
-    84,
-    215,
-    137,
-    107,
-    53
-}
+
+local crc8_854_table = { 0, 94, 188, 226, 97, 63, 221, 131, 194, 156, 126, 32, 163, 253, 31, 65, 157, 195, 33, 127, 252, 162, 64, 30, 95, 1, 227, 189, 62, 96, 130, 220, 35, 125, 159, 193, 66, 28, 254, 160, 225, 191, 93, 3, 128, 222, 60, 98, 190, 224, 2, 92, 223, 129, 99, 61, 124, 34, 192, 158, 29, 67, 161, 255, 70, 24, 250, 164, 39, 121, 155, 197, 132, 218, 56, 102, 229, 187, 89, 7, 219, 133, 103, 57, 186, 228, 6, 88, 25, 71, 165, 251, 120, 38, 196, 154, 101, 59, 217, 135, 4, 90, 184, 230, 167, 249, 27, 69, 198, 152, 122, 36, 248, 166, 68, 26, 153, 199, 37, 123, 58, 100, 134, 216, 91, 5, 231, 185, 140, 210, 48, 110, 237, 179, 81, 15, 78, 16, 242, 172, 47, 113, 147, 205, 17, 79, 173, 243, 112, 46, 204, 146, 211, 141, 111, 49, 178, 236, 14, 80, 175, 241, 19, 77, 206, 144, 114, 44, 109, 51, 209, 143, 12, 82, 176, 238, 50, 108, 142, 208, 83, 13, 239, 177, 240, 174, 76, 18, 145, 207, 45, 115, 202, 148, 118, 40, 171, 245, 23, 73, 8, 86, 180, 234, 105, 55, 213, 139, 87, 9, 235, 181, 54, 104, 138, 212, 149, 203, 41, 119, 244, 170, 72, 22, 233, 183, 85, 11, 136, 214, 52, 106, 43, 117, 151, 201, 74, 20, 246, 168, 116, 42, 200, 150, 21, 75, 169, 247, 182, 232, 10, 84, 215, 137, 107, 53 }
+
 function crc8_854(dataBuf, start_pos, end_pos)
     local crc = 0
     for si = start_pos, end_pos do
@@ -828,6 +584,7 @@ function crc8_854(dataBuf, start_pos, end_pos)
     end
     return crc
 end
+
 function decodeJsonToTable(cmd)
     local tb
     if JSON == nil then
@@ -836,6 +593,7 @@ function decodeJsonToTable(cmd)
     tb = JSON.decode(cmd)
     return tb
 end
+
 function encodeTableToJson(luaTable)
     local jsonStr
     if JSON == nil then
@@ -844,6 +602,7 @@ function encodeTableToJson(luaTable)
     jsonStr = JSON.encode(luaTable)
     return jsonStr
 end
+
 function string2table(hexstr)
     local tb = {}
     local i = 1
@@ -855,6 +614,7 @@ function string2table(hexstr)
     end
     return tb
 end
+
 function string2hexstring(str)
     local ret = ''
     for i = 1, #str do
@@ -862,6 +622,7 @@ function string2hexstring(str)
     end
     return ret
 end
+
 function table2string(cmd)
     local ret = ''
     local i
@@ -870,6 +631,7 @@ function table2string(cmd)
     end
     return ret
 end
+
 function checkBoundary(data, min, max)
     if (not data) then
         data = 0
@@ -885,6 +647,7 @@ function checkBoundary(data, min, max)
         end
     end
 end
+
 function string2Int(data)
     if (not data) then
         data = tonumber('0')
@@ -895,6 +658,7 @@ function string2Int(data)
     end
     return data
 end
+
 function int2String(data)
     if (not data) then
         data = tostring(0)
@@ -905,6 +669,7 @@ function int2String(data)
     end
     return data
 end
+
 function print_lua_table(lua_table, indent)
     indent = indent or 0
     for k, v in pairs(lua_table) do

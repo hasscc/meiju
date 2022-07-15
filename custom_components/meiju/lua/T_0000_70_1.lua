@@ -134,6 +134,7 @@ uptable["KEY_SEASONING5_TYPE"] = "seasoning5_type"
 uptable["KEY_SEASONING6_TYPE"] = "seasoning6_type"
 uptable["KEY_SEASONING7_TYPE"] = "seasoning7_type"
 uptable["KEY_SEASONING8_TYPE"] = "seasoning8_type"
+
 uptable["VALUE_VERSION"] = "1"
 uptable["VALUE_BOX_CLEAN"] = "box_clean"
 uptable["VALUE_SEASONING_COMPLETE"] = "seasoning_complete"
@@ -143,6 +144,7 @@ uptable["VALUE_SEASONING_OUTPUT"] = "seasoning_output"
 uptable["VALUE_SUCCESS"] = "success"
 uptable["VALUE_DATA_OVERFLOW"] = "data_overflow"
 uptable["VALUE_EXECUTION"] = "execution"
+
 uptable["BYTE_DEVICE_TYPE"] = 0x70
 uptable["BYTE_CONTROL_REQUEST"] = 0x02
 uptable["BYTE_QUERYL_REQUEST"] = 0x03
