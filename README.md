@@ -41,6 +41,8 @@ meiju:
   # https://github.com/hasscc/meiju/blob/main/custom_components/meiju/device_customizes.yaml
   customizes:
     B3: # Device type or sn8
+      get_extra: {10: 0x31}
+      set_extra: {10: 0x21}
       sensors:
         status:
           byte: 11
@@ -65,12 +67,16 @@ meiju:
         mode:
           byte: 12
           options:
-            0:
-              name: 空闲
-              extra: {11: 0x00}
-            23: 保洁(75分钟75℃)
-            26: 长效存储(15分钟60℃)
+            0: {name: 空闲, extra: {11: 0x00}}
+            23: {name: 保洁(75分钟75℃), extra: {13: 75, 14: 15, 27: 60}}
+            26: {name: 长效存储(15分钟60℃), extra: {13: 60, 14: 15, 27: 0}}
           set_extra: {11: 0x02}
+      numbers:
+        upstair_temp:
+          byte: 13
+          step: 5
+          min: 60
+          max: 125
 ```
 
 
@@ -106,6 +112,6 @@ data:
 
 
 ## Thanks
+- https://github.com/mac-zhou/midea-msmart
 - [@vividmuse](https://github.com/vividmuse)
 - [@blindlight86](https://github.com/blindlight86)
-- https://github.com/mac-zhou/midea-msmart

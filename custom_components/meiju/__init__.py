@@ -40,6 +40,8 @@ DEVICE_SCHEMA = vol.Schema(
         vol.Optional(CONF_PORT, default=DEFAULT_PORT): cv.positive_int,
         vol.Required(CONF_DEVICE_ID): cv.positive_int,
         vol.Optional(CONF_SCAN_INTERVAL, default=SCAN_INTERVAL): cv.time_period,
+        vol.Optional(CONF_LAN_KEY, default=''): cv.string,
+        vol.Optional(CONF_LAN_TOKEN, default=''): cv.string,
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -495,8 +497,8 @@ class BaseDevice:
         self.entities = {}
         self.listeners = {}
         self.status = {}
-        self.lan_key = None
-        self.lan_token = None
+        self.lan_key = self.get_config(CONF_LAN_KEY)
+        self.lan_token = self.get_config(CONF_LAN_TOKEN)
         try:
             self.lan_device = MsmartDevice(self.type, self.did, self.host, self.port)
         except TypeError:
@@ -590,16 +592,26 @@ class BaseDevice:
         return status
 
     async def auth_device(self):
+        auth = None
+        has_local = self.lan_key and self.lan_token
+        if has_local:
+            auth = await self.hass.async_add_executor_job(self.lan_device.authenticate, self.lan_key, self.lan_token)
+            if auth:
+                return
         for byteorder in ['big', 'little']:
             udpid = get_udpid(self.did.to_bytes(6, byteorder)) # noqa
             token, key = await self.hass.async_add_executor_job(self.account.cloud.gettoken, udpid)
-            auth = None
             if token:
                 auth = await self.hass.async_add_executor_job(self.lan_device.authenticate, key, token)
             if auth:
                 self.lan_key = key
                 self.lan_token = token
                 _LOGGER.debug('%s: Auth device success: %s', self.name, [byteorder, udpid, token, key])
+                if has_local:
+                    _LOGGER.warning(
+                        '%s: Auth device failed use key/token from config, please update them (key: %s, token: %s).',
+                        self.name, key, token,
+                    )
                 break
             _LOGGER.warning('%s: Auth device failed: %s', self.name, [byteorder, udpid, token, key])
 
