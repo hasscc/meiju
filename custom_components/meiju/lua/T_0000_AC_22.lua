@@ -107,6 +107,7 @@ local buzzerValue = 0x40
 local kickQuilt = 0
 local preventCold = 0
 local dataType = 0
+
 function jsonToModel(jsonCmd)
     local streams = jsonCmd
     if (streams[KEY_POWER] == VALUE_FUNCTION_ON) then
