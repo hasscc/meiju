@@ -53,7 +53,7 @@ class MsmartDevice(base_device):
         self._last_responses = responses
         for response in responses:
             self.process_response(response)
-        return responses
+        return responses[0] if responses else None
 
     @staticmethod
     def friendly_command(cmd):

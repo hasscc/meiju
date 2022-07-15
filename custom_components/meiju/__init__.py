@@ -612,7 +612,7 @@ class BaseDevice:
                 rsp = self.account.cloud.decode(
                     bytearray(self.account.decrypt_with_key(rep).encode())
                 )
-                rsp = bytes(rsp)
+                rsp = bytes(rsp[40:-16])
             else:
                 rsp = None
                 _LOGGER.warning('%s: Control failed via cloud: %s', self.name, [cmd.data.hex(' '), rdt])
@@ -620,6 +620,8 @@ class BaseDevice:
             rsp = await self.hass.async_add_executor_job(
                 self.lan_device.send_command, cmd
             )
+        if isinstance(rsp, bytes):
+            rsp = rsp.hex()
         _LOGGER.info('%s: Control device: %s', self.name, [cmd.data.hex(' '), rsp])
         return rsp
 
