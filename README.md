@@ -114,6 +114,13 @@ data:
   entity_id: sensor.xac_xxxxxx_info
 ```
 
+#### Get Meiju device plugin
+```yaml
+service: meiju.get_plugin
+data:
+  entity_id: sensor.xac_xxxxxx_info
+```
+
 
 ## Thanks
 - https://github.com/mac-zhou/midea-msmart
