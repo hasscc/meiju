@@ -6,7 +6,7 @@
 
 ```shell
 # Auto install via terminal shell
-wget -q -O - https://cdn.jsdelivr.net/gh/hasscc/get/get | DOMAIN=meiju REPO_PATH=hasscc/meiju ARCHIVE_TAG=main bash -
+wget -q -O - https://cdn.jsdelivr.net/gh/hasscc/get/get | HUB_DOMAIN=ghproxy.com/github.com DOMAIN=meiju REPO_PATH=hasscc/meiju ARCHIVE_TAG=main bash -
 ```
 
 
@@ -34,9 +34,11 @@ meiju:
           host: 192.168.1.123
     - username: 18866668882
       password: password2
+      scan_interval: 00:00:20
       devices:
         - device_id: 160123456789004
           host: 192.168.1.234
+          scan_interval: 00:00:15
 
   # https://github.com/hasscc/meiju/blob/main/custom_components/meiju/device_customizes.yaml
   customizes:
@@ -63,6 +65,8 @@ meiju:
           off_extra: {16: 0x00, 22: 0x00}
         lock:
           byte: 21
+          on_value: 0x01
+          off_value: 0x00
       selects:
         mode:
           byte: 12
