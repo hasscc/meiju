@@ -86,6 +86,14 @@ meiju:
 
 ## Services
 
+#### Get Meiju Devices
+```yaml
+service: meiju.get_devices
+data:
+  username: 18866668881
+  throw: true # Show result in HA notifications
+```
+
 #### Request Meiju API
 ```yaml
 service: meiju.request_api

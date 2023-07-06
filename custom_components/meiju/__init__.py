@@ -159,6 +159,14 @@ class ComponentServices:
         )
 
         hass.services.async_register(
+            DOMAIN, 'get_devices', self.async_get_devices,
+            schema=vol.Schema({
+                vol.Optional(CONF_USERNAME): cv.string,
+                vol.Optional('throw', default=True): cv.boolean,
+            }),
+        )
+
+        hass.services.async_register(
             DOMAIN, 'get_lua', self.async_get_lua,
             schema=vol.Schema({
                 vol.Required(ATTR_ENTITY_ID): cv.string,
@@ -193,9 +201,9 @@ class ComponentServices:
         unm = dat.get(CONF_USERNAME)
         acc = None
         for a in self.hass.data[DOMAIN][CONF_ACCOUNTS].values():
-            if not isinstance(acc, MeijuAccount):
+            if not isinstance(a, MeijuAccount):
                 continue
-            if unm and unm != acc.username:
+            if unm and unm != a.username:
                 continue
             acc = a
             break
@@ -245,6 +253,25 @@ class ComponentServices:
             'command': cmd,
         })
         return res
+
+    async def async_get_devices(self, call):
+        dat = call.data or {}
+        unm = dat.get(CONF_USERNAME)
+        dvs = {}
+        for a in self.hass.data[DOMAIN][CONF_ACCOUNTS].values():
+            if not isinstance(a, MeijuAccount):
+                continue
+            if unm and unm != a.username:
+                continue
+            dvs.update(dvs)
+        if dat.get('throw', True):
+            persistent_notification.async_create(
+                self.hass, f'{dvs}', f'Meiju devices:', f'{DOMAIN}-debug',
+            )
+        return {
+            'CONF_USERNAME': unm,
+            'devices': dvs,
+        }
 
     async def async_get_lua(self, call):
         dat = call.data or {}

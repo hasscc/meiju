@@ -57,6 +57,22 @@ send_command:
       selector:
         boolean:
 
+get_devices:
+  description: Get Meiju devices
+  fields:
+    username:
+      description: Login account
+      example: 18866668888
+      required: false
+      selector:
+        text:
+    throw:
+      description: Throw result
+      default: true
+      example: true
+      selector:
+        boolean:
+
 get_lua:
   description: Get Meiju device Lua script
   fields:
