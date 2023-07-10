@@ -269,7 +269,7 @@ class ComponentServices:
                 self.hass, f'{dvs}', f'Meiju devices:', f'{DOMAIN}-debug',
             )
         return {
-            'CONF_USERNAME': unm,
+            CONF_USERNAME: unm,
             'devices': dvs,
         }
 
