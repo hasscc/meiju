@@ -493,10 +493,8 @@ class MeijuAccount:
         dls = await self.get_devices()
         for dat in dls.values():
             dvc = BaseDevice(dat, {}, self)
-            _LOGGER.warning(' '.join([
-                f'{dvc.did}', dvc.type_hex, dvc.sn8, dvc.sn,
-                dat.get('enterpriseCode'), dat.get('modelNumber'), dat.get('name'),
-            ]))
+            _LOGGER.warning(f"{dvc.did}, {dvc.type_hex}, {dvc.sn8}, {dvc.sn},"
+                f"{dat.get('enterpriseCode')}, {dat.get('modelNumber')}, {dat.get('name')}")
         for cfg in devices:
             did = cfg.get(CONF_DEVICE_ID)
             dat = dls.get(str(did))
@@ -587,7 +585,11 @@ class BaseDevice:
 
     @property
     def sn8(self):
-        return self.info.get('sn8', '').upper()
+        sn8 = self.info.get('sn8', '')
+        if sn8:
+            return sn8.upper()
+        else:
+            return "00000000"
 
     @property
     def model(self):
